@@ -1,0 +1,5 @@
+import Icon from '../ui/Icon'
+
+export default function Topbar({ activeView, query, onQueryChange, onOpenModal }) {
+  return <header className="topbar"><button className="mobile-menu" aria-label="Abrir menú">☰</button><div className="breadcrumb"><span>Intelistock</span><span>/</span><strong>{activeView}</strong></div><div className="topbar-actions"><label className="search-box"><Icon name="search" /><input value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder="Buscar producto o SKU..." /></label><button className="icon-button notification" aria-label="Notificaciones" onClick={() => onOpenModal({ eyebrow: 'Centro de notificaciones', title: 'Alertas pendientes', children: <p>Tienes 1 alerta crítica y 2 alertas que requieren atención en el inventario.</p> })}><Icon name="bell" /><span></span></button><button className="top-avatar" onClick={() => onOpenModal({ eyebrow: 'Cuenta', title: 'María Rodríguez', children: <p>Administradora del espacio de trabajo Alimentos del Valle.</p> })}>MR</button></div></header>
+}
