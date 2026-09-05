@@ -81,3 +81,43 @@ def contar_registros_por_producto(df: pd.DataFrame) -> dict:
     """Cuenta cuántas filas de venta tiene cada producto, para decidir
     en train.py si usa Random Forest o fallback."""
     return df.groupby("producto_id")["fecha"].count().to_dict()
+
+
+MINIMO_DIAS_HISTORIAL = 30
+RECOMENDADO_DIAS_HISTORIAL = 90
+
+
+def puede_entrenar(datos: "DatosEntrenamiento") -> dict:
+    """Valida si un negocio tiene suficiente historial para entrenar.
+    Se debe llamar ANTES de invocar entrenar_modelo()."""
+    if not datos.ventas:
+        return {
+            "puede_entrenar": False,
+            "razon": "No hay ventas registradas.",
+            "dias_historial": 0,
+        }
+
+    fechas = [v.fecha for v in datos.ventas]
+    dias_historial = (max(fechas) - min(fechas)).days + 1
+
+    if dias_historial < MINIMO_DIAS_HISTORIAL:
+        return {
+            "puede_entrenar": False,
+            "razon": f"Se requieren al menos {MINIMO_DIAS_HISTORIAL} dias de historial, "
+            f"solo hay {dias_historial}.",
+            "dias_historial": dias_historial,
+        }
+
+    advertencia = None
+    if dias_historial < RECOMENDADO_DIAS_HISTORIAL:
+        advertencia = (
+            f"Tienes {dias_historial} dias de historial. "
+            f"Se recomiendan {RECOMENDADO_DIAS_HISTORIAL} para mayor precision."
+        )
+
+    return {
+        "puede_entrenar": True,
+        "razon": None,
+        "advertencia": advertencia,
+        "dias_historial": dias_historial,
+    }

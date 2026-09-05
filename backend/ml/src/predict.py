@@ -21,15 +21,13 @@ FEATURES = [
 ]
 
 
-def _cargar_artefacto(negocio_id: str, producto_id: str) -> dict:
+def _cargar_artefacto(negocio_id: str, producto_id: str) -> dict | None:
     """En producción, esta ruta debería venir de la tabla `modelos_entrenados`
     en vez de reconstruirse aquí. Por ahora, mientras no está esa integración,
     se arma la ruta directo."""
     path_archivo = MODELS_DIR / f"modelo_{negocio_id}_{producto_id}.joblib"
     if not path_archivo.exists():
-        raise FileNotFoundError(
-            f"No existe modelo entrenado para negocio={negocio_id}, producto={producto_id}"
-        )
+        return None
     return joblib.load(path_archivo)
 
 
@@ -68,8 +66,17 @@ def predecir(
     ultimos_datos: DataFrame ya procesado (salida de construir_dataset)
     con el histórico reciente del producto, ordenado por fecha.
     """
-    artefacto = _cargar_artefacto(solicitud.negocio_id, solicitud.producto_id)
     horizonte = int(solicitud.horizonte_dias.value)
+    artefacto = _cargar_artefacto(solicitud.negocio_id, solicitud.producto_id)
+
+    if artefacto is None:
+        return ResultadoPrediccion(
+            producto_id=solicitud.producto_id,
+            horizonte_dias=horizonte,
+            cantidad_estimada=0.0,
+            confianza="sin_datos",
+            metodo_usado="ninguno",
+        )
 
     if artefacto["tipo"] == "fallback_suavizado":
         cantidad_estimada = artefacto["valor_promedio"] * horizonte
@@ -97,11 +104,14 @@ def predecir(
 
         cantidad_estimada = sum(predicciones_diarias)
         mae = artefacto.get("mae_promedio")
-        confianza = (
-            "alta"
-            if mae is not None and mae < (cantidad_estimada / horizonte * 0.3)
-            else "media"
-        )
+        if mae is None:
+            confianza = "media"
+        elif cantidad_estimada == 0:
+            confianza = "alta" if mae == 0 else "media"
+        else:
+            confianza = (
+                "alta" if mae < (cantidad_estimada / horizonte * 0.3) else "media"
+            )
         metodo = "random_forest"
 
     return ResultadoPrediccion(

@@ -19,6 +19,7 @@ from ml.src.schema import (
 from ml.src.train import entrenar_modelo
 from ml.src.preprocessing import construir_dataset
 from ml.src.predict import predecir
+from ml.src.preprocessing import puede_entrenar
 
 # --- 1. Generar datos sinteticos de un negocio con 2 productos ---
 negocio_id = "negocio_test_1"
@@ -68,6 +69,51 @@ for producto_id, venta_base in [("prod_A", 10), ("prod_B", 3)]:
                 )
             )
 
+# Producto con pocos datos: para probar el fallback (menos de 20 registros)
+producto_id = "prod_C"
+venta_base = 5
+for i in range(10):  # solo 10 dias de historial
+    fecha = fecha_inicio + timedelta(days=i)
+    abierto = fecha.weekday() != 6
+    cantidad = max(0, int(np.random.poisson(venta_base))) if abierto else 0
+
+    ventas.append(
+        VentaHistorica(
+            negocio_id=negocio_id,
+            producto_id=producto_id,
+            fecha=fecha,
+            cantidad_vendida=cantidad,
+            negocio_abierto=abierto,
+        )
+    )
+    if cantidad > 0:
+        movimientos.append(
+            MovimientoStock(
+                negocio_id=negocio_id,
+                producto_id=producto_id,
+                fecha=fecha,
+                tipo="salida",
+                cantidad=cantidad,
+            )
+        )
+
+
+# Producto sin ninguna venta registrada (existe en catalogo pero nunca se vendio)
+producto_id = "prod_D"
+for i in range(30):
+    fecha = fecha_inicio + timedelta(days=i)
+    abierto = fecha.weekday() != 6
+    ventas.append(
+        VentaHistorica(
+            negocio_id=negocio_id,
+            producto_id=producto_id,
+            fecha=fecha,
+            cantidad_vendida=0,
+            negocio_abierto=abierto,
+        )
+    )
+
+
 datos = DatosEntrenamiento(
     negocio_id=negocio_id,
     ventas=ventas,
@@ -83,7 +129,7 @@ for producto_id, info in resumen.items():
 # --- 3. Predecir ---
 df_procesado = construir_dataset(datos)
 
-for producto_id in ["prod_A", "prod_B"]:
+for producto_id in ["prod_A", "prod_B", "prod_C", "prod_D"]:
     ultimos_datos = df_procesado[
         df_procesado["producto_id"] == producto_id
     ].sort_values("fecha")
@@ -97,3 +143,30 @@ for producto_id in ["prod_A", "prod_B"]:
     resultado = predecir(solicitud, ultimos_datos)
     print(f"\n=== Prediccion {producto_id} ===")
     print(resultado)
+
+datos_pocos_dias = DatosEntrenamiento(
+    negocio_id="negocio_test_2",
+    ventas=[
+        VentaHistorica(
+            negocio_id="negocio_test_2",
+            producto_id="prod_X",
+            fecha=date(2026, 8, 1),
+            cantidad_vendida=5,
+            negocio_abierto=True,
+        )
+    ],
+    movimientos_stock=[],
+)
+
+print("\n=== Prueba puede_entrenar (poco historial) ===")
+print(puede_entrenar(datos_pocos_dias))
+
+print("\n=== Prueba puede_entrenar (historial completo) ===")
+print(puede_entrenar(datos))
+
+
+from ml.src.evaluate import generar_reporte
+
+print("\n=== Reporte de evaluacion ===")
+reporte = generar_reporte(datos, resumen)
+print(reporte.to_string(index=False))
