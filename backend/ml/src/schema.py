@@ -1,4 +1,4 @@
-from pydantic import Basemodel, Field
+from pydantic import BaseModel, Field
 from datetime import date
 from enum import (
     Enum,
@@ -10,7 +10,7 @@ class TipoMovimiento(str, Enum):
     salida = "salida"
 
 
-class VentaHistorica(Basemodel):
+class VentaHistorica(BaseModel):
     negocio_id: str
     producto_id: str
     fecha: date
@@ -18,20 +18,20 @@ class VentaHistorica(Basemodel):
     negocio_abierto: bool = True
 
 
-class MovimientoStock(Basemodel):
+class MovimientoStock(BaseModel):
     negocio_id: str
-    productto_id: str
+    producto_id: str
     fecha: date
     tipo: TipoMovimiento
-    cantiad: int = Field(gt=0)  # gt = greater than
+    cantidad: int = Field(gt=0)  # gt = greater than
 
 
-class DatosEntrenamiento(Basemodel):
+class DatosEntrenamiento(BaseModel):
     """Lo que recibe train.py: historico completo de un negocio"""
 
     negocio_id: str
     ventas: list[VentaHistorica]
-    movmientos_stock: list[MovimientoStock]
+    movimientos_stock: list[MovimientoStock]
 
 
 class HorizontePrediccion(str, Enum):
@@ -39,15 +39,15 @@ class HorizontePrediccion(str, Enum):
     treinta_dias = "30"
 
 
-class SolicitudPrediccion(Basemodel):
+class SolicitudPrediccion(BaseModel):
     """Lo que recibe predict.py"""
 
     negocio_id: str
     producto_id: str
-    horizonte_prediccion: HorizontePrediccion
+    horizonte_dias: HorizontePrediccion
 
 
-class ResultadoPrediccion(Basemodel):
+class ResultadoPrediccion(BaseModel):
     """Lo que devuelve predict.py"""
 
     producto_id: str
