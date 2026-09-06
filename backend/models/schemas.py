@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from decimal import Decimal
+from datetime import datetime
 from typing import Optional
 
 
@@ -24,15 +25,12 @@ class ProductoOut(ProductoCreate):
         from_attributes = True
 
 
-class PrediccionRequest(BaseModel):
+class NegocioOut(BaseModel):
     negocio_id: int
-    producto_id: int
-    dias: int = 7
+    nombre: str
+    rfc: Optional[str] = None
+    fecha_registro: Optional[datetime] = None
+    estado: str
 
-
-class PrediccionResponse(BaseModel):
-    producto_id: int
-    horizonte_dias: int
-    cantidad_estimada: float
-    confianza: str
-    metodo_usado: str
+    class Config:
+        from_attributes = True

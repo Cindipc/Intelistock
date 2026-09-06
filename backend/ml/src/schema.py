@@ -35,7 +35,6 @@ class DatosEntrenamiento(BaseModel):
 
 
 class HorizontePrediccion(str, Enum):
-    siete_dias = "7"
     quince_dias = "15"
     treinta_dias = "30"
 

@@ -6,7 +6,7 @@ import Topbar from './components/navigation/Topbar'
 import DashboardPage from './pages/dashboard/DashboardPage'
 import PredictionsPage from './pages/predictions/PredictionsPage'
 import HistoricalPage from './pages/historical/HistoricalPage'
-import CompaniesPage from './pages/companies/CompaniesPage'
+import BusinessPage from './pages/business/BusinessPage'
 import PreferencesPage from './pages/preferences/PreferencesPage'
 import Modal from './components/ui/Modal'
 
@@ -24,7 +24,7 @@ function App() {
   const renderView = () => {
     if (activeView === 'Predicciones') return <PredictionsPage onOpenModal={setModal} />
     if (activeView === 'Datos historicos') return <HistoricalPage />
-    if (activeView === 'Empresas') return <CompaniesPage />
+    if (activeView === 'Mi Negocio') return <BusinessPage />
     if (activeView === 'Preferencias') return <PreferencesPage />
     return <DashboardPage query={query} onQueryChange={setQuery} onRefresh={handleRefresh} onOpenModal={setModal} updated={updated} />
   }

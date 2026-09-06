@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Icon from '../../components/ui/Icon'
 import { branches, inventoryProducts } from '../../data/dashboardData'
-import { listarProductos, normalizarProducto, obtenerPrediccion } from '../../routes/api'
-const NEGOCIO_ID_DEMO = 1
+import { listarProductos, normalizarProducto, obtenerPrediccion, NEGOCIO_ID } from '../../routes/api'
 
 function StockProductList({ products, apiRecomendaciones }) {
   const buscarRecomendacion = (product) => apiRecomendaciones?.find((r) => Number(r.producto_id) === Number(product.backendId))
@@ -56,7 +55,7 @@ function useBackendProducts() {
 
   useEffect(() => {
     let cancelled = false
-    listarProductos(NEGOCIO_ID_DEMO)
+    listarProductos(NEGOCIO_ID)
       .then((data) => {
         if (!cancelled) {
           if (Array.isArray(data) && data.length > 0) {
@@ -87,11 +86,52 @@ export default function PredictionsPage({ onOpenModal }) {
   const [apiRecomendaciones, setApiRecomendaciones] = useState(null)
   const [cargando, setCargando] = useState(false)
   const [error, setError] = useState(null)
+  const [productoSeleccionado, setProductoSeleccionado] = useState('')
+  const [horizonteSeleccionado, setHorizonteSeleccionado] = useState('15')
 
   const { products: backendProducts, dataSource } = useBackendProducts()
   const branch = branches.find((item) => item.id === branchId)
   const inStockProducts = useMemo(() => backendProducts.filter((product) => product.available > 0), [backendProducts])
   const predictedDemand = (product) => Math.round(product.sold30 * (1 + Number.parseFloat(product.trend) / 100))
+
+  useEffect(() => {
+    if (!productoSeleccionado && inStockProducts.length > 0) {
+      setProductoSeleccionado(String(inStockProducts[0].backendId))
+    }
+  }, [inStockProducts, productoSeleccionado])
+
+  const mergeRecomendacion = (nueva) => {
+    setApiRecomendaciones((prev) => {
+      const anteriores = prev ? prev.filter((r) => Number(r.producto_id) !== Number(nueva.producto_id)) : []
+      return [...anteriores, nueva]
+    })
+  }
+
+  const calcularUnProducto = async () => {
+    if (!productoSeleccionado) {
+      setError('Selecciona un producto primero.')
+      return
+    }
+    setCargando(true)
+    setError(null)
+    try {
+      const respuesta = await obtenerPrediccion(NEGOCIO_ID, { producto_id: productoSeleccionado, horizonte_dias: horizonteSeleccionado })
+      mergeRecomendacion(respuesta)
+      setView('Demanda')
+    } catch (err) {
+      const msg = err.message?.includes('__DB_ERR__')
+        ? err.message.replace('__DB_ERR__', '')
+        : err.message?.includes('__CONN_ERR__')
+          ? err.message.replace('__CONN_ERR__', '')
+          : err.message || 'No se pudo conectar con el servicio de prediccion.'
+      setError(msg)
+      if (onOpenModal) {
+        onOpenModal({ eyebrow: 'Error de prediccion', title: 'No se pudo calcular', children: <p>{msg}</p> })
+      }
+    } finally {
+      setCargando(false)
+    }
+  }
 
   const calcularConIA = async () => {
     setCargando(true)
@@ -102,7 +142,7 @@ export default function PredictionsPage({ onOpenModal }) {
         setError('No hay productos con ID de backend para predecir.')
         return
       }
-      const respuestas = await Promise.all(productosParaPredecir.map((product) => obtenerPrediccion(NEGOCIO_ID_DEMO, { producto_id: product.backendId, dias: 15 })))
+      const respuestas = await Promise.all(productosParaPredecir.map((product) => obtenerPrediccion(NEGOCIO_ID, { producto_id: product.backendId, horizonte_dias: horizonteSeleccionado })))
       setApiRecomendaciones(respuestas)
       setView('Demanda')
     } catch (err) {
@@ -189,13 +229,36 @@ export default function PredictionsPage({ onOpenModal }) {
         </div>
 
         {view === 'Resumen' && (
-          <div className="branch-insight">
-            <span className="status-pulse" />
-            <span>La sucursal tiene <strong>{inStockProducts.filter(p => p.risk === 'Critico' || p.risk === 'Bajo').length} productos en riesgo</strong>. Calcula la prediccion real con el modelo antes de generar la proxima orden.</span>
-            <button onClick={calcularConIA} disabled={cargando}>
-              {cargando ? 'Calculando...' : 'Calcular con IA'} <Icon name="arrow" />
-            </button>
-          </div>
+          <>
+            <div className="panel" style={{ marginTop: 17, display: 'flex', alignItems: 'flex-end', gap: 16, flexWrap: 'wrap' }}>
+              <label className="branch-id-field" style={{ minWidth: 220 }}>
+                <span>PRODUCTO</span>
+                <select value={productoSeleccionado} onChange={(e) => setProductoSeleccionado(e.target.value)}>
+                  {inStockProducts.map((p) => (
+                    <option key={p.id} value={p.backendId}>{p.name}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="branch-id-field" style={{ minWidth: 140 }}>
+                <span>HORIZONTE</span>
+                <select value={horizonteSeleccionado} onChange={(e) => setHorizonteSeleccionado(e.target.value)}>
+                  <option value="15">15 dias</option>
+                  <option value="30">30 dias</option>
+                </select>
+              </label>
+              <button className="refresh-button" onClick={calcularUnProducto} disabled={cargando || !productoSeleccionado}>
+                {cargando ? 'Calculando...' : 'Predecir este producto'}
+              </button>
+            </div>
+
+            <div className="branch-insight">
+              <span className="status-pulse" />
+              <span>La sucursal tiene <strong>{inStockProducts.filter(p => p.risk === 'Critico' || p.risk === 'Bajo').length} productos en riesgo</strong>. Tambien puedes calcular la prediccion de todos los productos a la vez.</span>
+              <button onClick={calcularConIA} disabled={cargando}>
+                {cargando ? 'Calculando...' : 'Calcular todos con IA'} <Icon name="arrow" />
+              </button>
+            </div>
+          </>
         )}
 
         {error && (

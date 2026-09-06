@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from routers import productos, importacion, prediccion, ventas
+from routers import importacion, negocios, prediccion, productos
+from routers import ventas
 from database import db_is_available
 from sqlalchemy.exc import OperationalError
 
@@ -9,7 +10,11 @@ app = FastAPI(title="IntelliStock API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173", "*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:5173",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -39,6 +44,7 @@ app.include_router(productos.router)
 app.include_router(importacion.router)
 app.include_router(prediccion.router)
 app.include_router(ventas.router)
+app.include_router(negocios.router)
 
 
 @app.get("/")

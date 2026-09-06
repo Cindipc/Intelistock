@@ -17,13 +17,11 @@ const rowStyle = { ...tableGrid, minHeight: 56, borderTop: '1px solid #dfe6f0', 
 export default function HistoricalPage() {
   const [ventas, setVentas] = useState([])
   const [dataSource, setDataSource] = useState('loading')
-  const [, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [uploadStatus, setUploadStatus] = useState('')
   const [uploading, setUploading] = useState(false)
 
   const cargarVentas = useCallback(async () => {
-    setLoading(true)
     setError(null)
     try {
       const data = await listarVentas(1)
@@ -38,40 +36,12 @@ export default function HistoricalPage() {
       setVentas(VENTAS_DEMO)
       setDataSource('demo')
       setError('Backend no disponible. Mostrando datos de demostracion.')
-    } finally {
-      setLoading(false)
     }
   }, [])
 
   useEffect(() => {
-    let cancelled = false
-    async function run() {
-      setLoading(true)
-      setError(null)
-      try {
-        const data = await listarVentas(1)
-        if (!cancelled) {
-          if (Array.isArray(data) && data.length > 0) {
-            setVentas(data.map(normalizarVenta))
-            setDataSource('backend')
-          } else if (Array.isArray(data)) {
-            setVentas(VENTAS_DEMO)
-            setDataSource('empty')
-          }
-        }
-      } catch {
-        if (!cancelled) {
-          setVentas(VENTAS_DEMO)
-          setDataSource('demo')
-          setError('Backend no disponible. Mostrando datos de demostracion.')
-        }
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }
-    run()
-    return () => { cancelled = true }
-  }, [])
+    cargarVentas()
+  }, [cargarVentas])
 
   const handleUpload = async (file) => {
     if (!file) return
@@ -93,39 +63,40 @@ export default function HistoricalPage() {
   const ingresosFormateados = `$${Number(totalIngresos).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
   return (
-    <div className="page-content workbench-page">
-      <div className="workbench-header">
+    <div className="page-content">
+      <div className="workspace-hero">
         <div>
           <p className="eyebrow">CENTRO DE DATOS</p>
           <h1>Historial de Ventas</h1>
           <p className="subtitle">Consulta registros de venta y carga nuevos archivos para alimentar los modelos predictivos.</p>
         </div>
-        <span className="sync-badge" style={{ padding: '6px 12px', borderRadius: 8, fontSize: 11, background: dataSource === 'backend' ? '#e5f4eb' : '#fff8f0', color: dataSource === 'backend' ? '#38805e' : '#aa741d', fontWeight: 700 }}>
+        <span style={{ padding: '6px 12px', borderRadius: 8, fontSize: 11, background: dataSource === 'backend' ? '#e5f4eb' : '#fff8f0', color: dataSource === 'backend' ? '#38805e' : '#aa741d', fontWeight: 700 }}>
           {dataSource === 'backend' ? '● Sincronizado' : dataSource === 'empty' ? '● Sin datos' : dataSource === 'loading' ? '● Cargando...' : '● Modo demo'}
         </span>
       </div>
 
-      <section className="recommendation-kpis">
-        <article><span>REGISTROS</span><strong>{totalVentas}</strong><small>{dataSource === 'backend' ? 'ventas reales' : 'datos de ejemplo'}</small></article>
-        <article><span>INGRESOS</span><strong>{ingresosFormateados}</strong><small>acumulado</small></article>
-        <article><span>ESTADO</span><strong>{dataSource === 'backend' ? 'Activo' : dataSource === 'empty' ? 'Conectado' : dataSource === 'loading' ? 'Cargando' : 'Demo'}</strong><small>{dataSource === 'demo' ? 'Sin conexion' : 'Backend OK'}</small></article>
+      <section className="workspace-cards">
+        <article className="workspace-card"><span>REGISTROS</span><strong>{totalVentas}</strong><small>{dataSource === 'backend' ? 'ventas reales' : 'datos de ejemplo'}</small></article>
+        <article className="workspace-card"><span>INGRESOS</span><strong>{ingresosFormateados}</strong><small>acumulado</small></article>
+        <article className="workspace-card"><span>ESTADO</span><strong>{dataSource === 'backend' ? 'Activo' : dataSource === 'empty' ? 'Conectado' : dataSource === 'loading' ? 'Cargando' : 'Demo'}</strong><small>{dataSource === 'demo' ? 'Sin conexion' : 'Backend OK'}</small></article>
       </section>
 
       {dataSource === 'empty' && (
-        <div className="branch-insight" style={{ background: '#edf3fc', color: '#5175af', borderRadius: 8, padding: '10px 16px', fontSize: 12 }}>
-          <span>ℹ</span><span>Backend conectado pero sin ventas registradas. Sube un archivo CSV para comenzar.</span>
+        <div className="branch-insight" style={{ marginTop: 20 }}>
+          <span className="status-pulse"></span>
+          <span>Backend conectado pero sin ventas registradas. Sube un archivo CSV para comenzar.</span>
         </div>
       )}
 
-      <div className="history-grid">
-        <section className="history-card">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginTop: 24 }}>
+        <section className="panel">
           <h2>1. Carga de Ventas</h2>
-          <p>Actualiza la base estadistica con las ventas de tu negocio.</p>
-          <div className="upload-zone">
+          <p className="panel-description">Actualiza la base estadistica con las ventas de tu negocio.</p>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, minHeight: 160, marginTop: 16, border: '1.5px dashed #9eb3cf', borderRadius: 10, background: '#f7faff', padding: 20, textAlign: 'center' }}>
             <span style={{ fontSize: 24 }}>⇧</span>
-            <strong>Selecciona tu archivo de ventas</strong>
-            <small>Archivos permitidos: .xlsx · .csv</small>
-            <label className="primary-button" style={{ cursor: 'pointer', marginTop: 8 }}>
+            <strong style={{ fontSize: 12 }}>Selecciona tu archivo de ventas</strong>
+            <small style={{ color: 'var(--muted)' }}>Archivos permitidos: .xlsx · .csv</small>
+            <label className="refresh-button" style={{ cursor: 'pointer', marginTop: 10, display: 'inline-flex' }}>
               {uploading ? 'Subiendo...' : 'Seleccionar archivo'}
               <input type="file" accept=".xlsx,.csv" style={{ display: 'none' }} onChange={(e) => handleUpload(e.target.files?.[0])} disabled={uploading} />
             </label>
@@ -133,29 +104,31 @@ export default function HistoricalPage() {
           </div>
         </section>
 
-        <section className="history-card">
+        <section className="panel">
           <h2>2. Movimiento de Inventario</h2>
-          <p>Los movimientos se gestionan en una proxima ruta CRUD del backend.</p>
-          <div className="upload-zone" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: 0.6 }}>
+          <p className="panel-description">Los movimientos se gestionan en una proxima ruta CRUD del backend.</p>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, minHeight: 160, marginTop: 16, border: '1.5px dashed #dfe6f0', borderRadius: 10, background: '#fafbfa', padding: 20, opacity: 0.65, textAlign: 'center' }}>
             <span style={{ fontSize: 24 }}>◌</span>
-            <strong>Proximamente</strong>
-            <small>Endpoint /movimientos en desarrollo</small>
+            <strong style={{ fontSize: 12 }}>Proximamente</strong>
+            <small style={{ color: 'var(--muted)' }}>Endpoint /movimientos en desarrollo</small>
           </div>
         </section>
       </div>
 
       {error && (
-        <div className="branch-insight" style={{ background: '#fee4de', color: '#c5684e', marginTop: 16, borderRadius: 8, padding: '10px 16px', fontSize: 12 }}>
+        <div className="branch-insight" style={{ marginTop: 16, background: '#fee4de', color: '#c5684e' }}>
           <span>⚠</span><span>{error}</span>
           <button onClick={cargarVentas} style={{ marginLeft: 'auto', background: 'transparent', color: '#c5684e', fontWeight: 700, fontSize: 11 }}>Reintentar</button>
         </div>
       )}
 
       {ventas.length > 0 && (
-        <div style={{ marginTop: 24, background: '#fff', border: '1px solid #dfe6f0', borderRadius: 12, overflow: 'hidden', boxShadow: '0 8px 24px rgb(30 53 87 / 5%)' }}>
-          <div style={{ padding: '18px 22px', borderBottom: '1px solid #dfe6f0' }}>
-            <p className="panel-kicker">VENTAS REGISTRADAS</p>
-            <h2 style={{ margin: 0, fontSize: 19, fontFamily: "'Space Grotesk', sans-serif" }}>{dataSource === 'backend' ? 'Datos del backend' : 'Datos de ejemplo'}</h2>
+        <div className="workspace-table" style={{ marginTop: 24 }}>
+          <div className="table-header">
+            <div>
+              <p className="panel-kicker">VENTAS REGISTRADAS</p>
+              <h2>{dataSource === 'backend' ? 'Datos del backend' : 'Datos de ejemplo'}</h2>
+            </div>
           </div>
           <div style={headerStyle}>
             <span>ID</span>

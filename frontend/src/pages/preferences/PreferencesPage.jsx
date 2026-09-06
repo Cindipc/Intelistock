@@ -25,42 +25,28 @@ export default function PreferencesPage() {
         <article className="workspace-card"><span>USUARIOS CON ACCESO</span><strong>4</strong><small>1 administrador</small></article>
       </section>
 
-      <section className="catalog-table">
-        <div className="catalog-table-head">
-          <span>CONFIGURACION</span>
-          <span>VALOR</span>
-          <span>ESTADO</span>
+      <section className="workspace-table" style={{ marginTop: 24 }}>
+        <div className="table-header">
+          <div>
+            <p className="panel-kicker">CONFIGURACION</p>
+            <h2>Ajustes activos</h2>
+          </div>
         </div>
-        <div className="catalog-row">
-          <code>Notificaciones por correo</code>
-          <span><strong>Alertas de stock critico y reorden activadas</strong></span>
-          <span className="risk-badge risk-saludable">Activa</span>
-        </div>
-        <div className="catalog-row">
-          <code>Reportes automaticos</code>
-          <span><strong>Resumen semanal los lunes a las 8:00</strong></span>
-          <span className="risk-badge risk-saludable">Activa</span>
-        </div>
-        <div className="catalog-row">
-          <code>Modo oscuro</code>
-          <span><strong>En desarrollo</strong></span>
-          <span className="risk-badge risk-bajo">Proximamente</span>
-        </div>
-        <div className="catalog-row">
-          <code>Exportacion de datos</code>
-          <span><strong>CSV y PDF habilitados</strong></span>
-          <span className="risk-badge risk-saludable">Activa</span>
-        </div>
-        <div className="catalog-row">
-          <code>Sucursal por defecto</code>
-          <span><strong>SUC-001 · Centro, Ciudad de Mexico</strong></span>
-          <span className="risk-badge risk-saludable">Configurada</span>
-        </div>
-        <div className="catalog-row">
-          <code>Horizonte de prediccion</code>
-          <span><strong>15 dias</strong></span>
-          <span className="risk-badge risk-saludable">Activa</span>
-        </div>
+        {[
+          { label: 'Notificaciones por correo', valor: 'Alertas de stock critico y reorden activadas', estado: 'Activa', tono: 'good' },
+          { label: 'Reportes automaticos', valor: 'Resumen semanal los lunes a las 8:00', estado: 'Activa', tono: 'good' },
+          { label: 'Modo oscuro', valor: 'En desarrollo', estado: 'Proximamente', tono: '' },
+          { label: 'Exportacion de datos', valor: 'CSV y PDF habilitados', estado: 'Activa', tono: 'good' },
+          { label: 'Sucursal por defecto', valor: 'SUC-001 · Centro, Ciudad de Mexico', estado: 'Configurada', tono: 'good' },
+          { label: 'Horizonte de prediccion', valor: '15 dias', estado: 'Activa', tono: 'good' },
+        ].map((item, index) => (
+          <div className="workspace-row" key={item.label}>
+            <span className="row-number">{String(index + 1).padStart(2, '0')}</span>
+            <strong>{item.label}</strong>
+            <span>{item.valor}</span>
+            <b className={`row-status ${item.tono}`}>{item.estado}</b>
+          </div>
+        ))}
       </section>
     </div>
   )
