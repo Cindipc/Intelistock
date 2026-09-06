@@ -1,6 +1,6 @@
 import { registrarVentasLote, registrarMovimiento, crearProducto } from '../routes/api'
 
-export const NEGOCIO_ID_DEMO = 'negocio-demo-1'
+export const NEGOCIO_ID_DEMO = 1
 
 function generarVentasSimuladas(producto, dias = 90) {
   const ventas = []
