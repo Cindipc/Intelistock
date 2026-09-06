@@ -1,5 +1,26 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
 
+/* Legibilidad y acabado premium */
+body { font-size: 14px; }
+.sidebar { background: #fbfcff; box-shadow: 3px 0 18px rgb(24 43 72 / 4%); }
+.nav-item { min-height: 44px; font-size: 13px; }
+.nav-label, .eyebrow, .panel-kicker { font-size: 11px; color: #71809a; }
+.workspace-switcher strong, .user-row strong, .help-card strong { font-size: 12px; }
+.workspace-switcher small, .user-row small, .help-card small { font-size: 11px; }
+.inventory-metric p, .panel-description, .product-main small, .stock-cell small, .demand-cell small, .coverage-cell small, .alert-copy small, .work-heading p:not(.panel-kicker), .stock-list-heading p:not(.panel-kicker) { font-size: 11px; }
+.inventory-filters select, .table-search input, .catalog-search input, .dashboard-search input { font-size: 12px; }
+.product-main strong, .stock-cell strong, .demand-cell strong, .coverage-cell strong { font-size: 13px; }
+.product-header, .stock-list-header, .dashboard-list-header, .catalog-table-head { font-size: 10px; }
+.risk-badge, .confidence-pill, .stock-warning, .stock-ok, .row-action, .dashboard-detail { font-size: 10px; }
+.alert-copy strong, .alert-impact, .work-status, .work-consequence, .work-recommendation p { font-size: 12px; }
+.work-actions button, .ml-status button, .upload-button { font-size: 11px; }
+.product-dashboard, .workbench-page { background: #f5f7fb; }
+.dashboard-product-card { min-height: 82px; }
+.dashboard-detail-panel, .recommendation-card, .catalog-table, .history-card, .subscription-main, .subscription-side { box-shadow: 0 8px 24px rgb(24 43 72 / 5%); }
+.primary-button, .refresh-button { box-shadow: 0 5px 12px rgb(8 127 120 / 12%); }
+.sync-action, .confidence-high { border: 1px solid #bde7d8; }
+.workbench-header h1::after, .dashboard-page-heading h1::after { content: ''; display: inline-block; width: 24px; height: 3px; margin: 0 0 7px 10px; background: #c6a45d; border-radius: 2px; }
+@media (max-width: 720px) { .dashboard-page-heading { align-items: flex-start; flex-direction: column; }.dashboard-product-card { min-height: 88px; }.dashboard-product-info strong { font-size: 12px; }.dashboard-product-info small { font-size: 10px; }.dashboard-list-header, .dashboard-product-card { gap: 9px; padding: 0 12px; } }
 :root { --ink: #1d2829; --muted: #7d8989; --line: #e5e8e5; --paper: #f7f8f5; --white: #fff; --teal: #087f78; --teal-dark: #075e59; --mint: #dff3eb; --coral: #eb765f; --yellow: #f5bd4f; --blue: #6f9de0; }
 * { box-sizing: border-box; }
 button, input { font: inherit; }
@@ -25,6 +46,33 @@ button { border: 0; cursor: pointer; }
 .workspace-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; padding-bottom: 34px; border-bottom: 1px solid var(--line); }.workspace-hero h1 { margin: 0; color: var(--ink); font: 600 clamp(28px, 3vw, 39px)/1.1 'Space Grotesk', sans-serif; letter-spacing: -1.5px; }.workspace-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 17px; margin-top: 28px; }.workspace-card { display: flex; flex-direction: column; min-height: 134px; padding: 19px 20px; background: #fff; border: 1px solid var(--line); border-radius: 11px; }.workspace-card span { color: #98a39f; font-size: 10px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase; }.workspace-card strong { margin-top: 21px; font: 600 27px 'Space Grotesk', sans-serif; letter-spacing: -.8px; }.workspace-card small { margin-top: 5px; color: var(--muted); font-size: 10px; }.workspace-table { margin-top: 29px; overflow: hidden; background: #fff; border: 1px solid var(--line); border-radius: 11px; }.table-header { display: flex; align-items: flex-end; justify-content: space-between; padding: 22px; }.workspace-row { display: grid; grid-template-columns: 42px minmax(120px, 1fr) minmax(150px, 1.2fr) 90px 25px; align-items: center; gap: 12px; min-height: 60px; padding: 8px 22px; border-top: 1px solid var(--line); font-size: 11px; }.workspace-row strong { font-size: 11px; }.row-number { color: #a5b0ac; font-size: 10px; }.workspace-row > span:not(.row-number):not(.company-arrow) { color: var(--muted); font-size: 10px; }.row-status { color: #c48631; font-size: 9px; font-weight: 700; }.row-status.good { color: #3b9a70; }
 @media (max-width: 1050px) { .sidebar { width: 220px; }.topbar { padding: 0 25px; }.page-content { padding: 35px 25px; }.dashboard-grid { grid-template-columns: 1fr; }.alerts-panel { min-height: 300px; } }
 @media (max-width: 720px) { .sidebar { display: none; }.topbar { height: 64px; padding: 0 18px; }.mobile-menu { display: grid; font-size: 18px; }.breadcrumb { display: none; }.topbar-actions { gap: 13px; }.search-box { width: 145px; }.page-content { padding: 29px 16px 40px; }.welcome-row { align-items: flex-start; flex-direction: column; }.refresh-button { align-self: stretch; justify-content: center; }.metric-grid, .workspace-cards { grid-template-columns: 1fr; gap: 11px; margin-top: 26px; }.metric-card { min-height: 145px; }.dashboard-grid { margin-top: 11px; }.panel { padding: 18px 15px; }.panel-header { flex-direction: column; }.period-tabs { align-self: stretch; justify-content: space-between; }.period-tabs button { flex: 1; }.chart-legend { justify-content: flex-start; }.chart { height: 190px; }.bar { width: 15px; }.chart-note { align-items: flex-start; flex-wrap: wrap; }.chart-note button { width: 100%; margin: 4px 0 0 14px; }.companies-section { margin-top: 27px; }.section-heading, .workspace-hero { align-items: flex-start; flex-direction: column; }.company-card { flex-wrap: wrap; gap: 9px; padding: 12px 9px; }.company-info { min-width: calc(100% - 56px); }.company-status { margin-left: 0; }.company-trend { width: auto; margin-left: auto; }.company-arrow { display: none; }.workspace-row { grid-template-columns: 25px 1fr 25px; gap: 7px; padding: 10px 14px; }.workspace-row > span:nth-child(3), .row-status { display: none; }.table-header { align-items: flex-start; flex-direction: column; gap: 13px; padding: 18px 15px; } }
+
+/* Sistema visual final compartido */
+:root { --surface: #ffffff; --surface-soft: #f4f7fc; --text-strong: #172742; --text-body: #566982; --text-muted: #7c8ca3; --border-soft: #dfe6f0; --accent-gold: #c6a45d; }
+body { color: var(--text-body); background: #f4f7fb; font-size: 14px; }
+.app-shell { background: #f4f7fb; }
+.page-content { max-width: 1380px; padding: 42px 52px 72px; }
+.page-content h1, .page-content h2, .page-content h3 { color: var(--text-strong); }
+.page-content p { line-height: 1.55; }
+.panel, .metric-card, .workspace-card, .workspace-table, .branch-picker, .branch-summary, .stock-product-list, .product-panel, .dashboard-product-list, .catalog-table, .history-maturity, .history-card, .subscription-main, .subscription-side { border-color: var(--border-soft); border-radius: 12px; box-shadow: 0 8px 24px rgb(30 53 87 / 5%); }
+.workbench-page, .product-dashboard { background: transparent; }
+.workbench-header, .dashboard-page-heading, .welcome-row { min-height: 112px; padding-bottom: 28px; border-bottom: 1px solid var(--border-soft); }
+.workbench-header h1, .dashboard-page-heading h1, .welcome-row h1 { color: var(--text-strong); font-size: clamp(30px, 3vw, 42px); }
+.workbench-header h1::after, .dashboard-page-heading h1::after, .welcome-row h1::after { content: ''; display: inline-block; width: 26px; height: 3px; margin: 0 0 8px 10px; background: var(--accent-gold); border-radius: 3px; }
+.eyebrow, .panel-kicker { color: #72819a; font-size: 11px; letter-spacing: 1.35px; }
+.subtitle { color: var(--text-muted); font-size: 14px; }
+.catalog-toolbar, .recommendation-tabs, .dashboard-filter-bar { margin-top: 20px; padding: 14px; border: 1px solid var(--border-soft); border-radius: 10px; box-shadow: 0 6px 18px rgb(30 53 87 / 4%); }
+.catalog-table, .recommendation-list, .dashboard-product-list, .history-grid, .subscription-layout { margin-top: 20px; }
+.catalog-table-head, .dashboard-list-header { min-height: 44px; background: #edf3fc; color: #63748e; font-size: 10px; }
+.catalog-row, .dashboard-product-card { min-height: 84px; font-size: 12px; }
+.catalog-row strong, .dashboard-product-info strong, .recommendation-product h2 { color: var(--text-strong); font-size: 13px; }
+.catalog-row small, .dashboard-product-info small, .recommendation-product p, .stock-product-name small { color: var(--text-muted); font-size: 11px; }
+.recommendation-kpis { margin-top: 20px; }.recommendation-kpis article { min-height: 142px; border-color: var(--border-soft); box-shadow: 0 8px 22px rgb(30 53 87 / 5%); }.recommendation-kpis strong { font-size: 29px; }.recommendation-card { min-height: 164px; border-color: var(--border-soft); border-left-width: 4px; }.recommendation-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgb(30 53 87 / 9%); }.detail-button { font-size: 11px; }
+.history-maturity { padding: 28px; }.history-maturity strong { font-size: 36px; }.history-grid { gap: 20px; }.history-card { min-height: 330px; padding: 25px; }.history-card h2 { font-size: 19px; }.upload-zone { min-height: 190px; border-color: #9eb3cf; background: #f7faff; }
+.subscription-layout { gap: 20px; }.subscription-main, .subscription-side { padding: 30px; }.subscription-price { font-size: 36px; }.subscription-cards article { min-height: 104px; padding: 18px; }
+.ml-status, .dashboard-note { min-height: 50px; font-size: 12px; }.ml-status button, .upload-button { font-size: 11px; }
+@media (max-width: 900px) { .page-content { padding: 34px 26px 58px; }.workbench-header, .dashboard-page-heading, .welcome-row { min-height: 0; }.catalog-toolbar, .recommendation-tabs, .dashboard-filter-bar { align-items: stretch; flex-wrap: wrap; }.recommendation-kpis, .history-grid, .subscription-layout { grid-template-columns: 1fr; } }
+@media (max-width: 720px) { .page-content { padding: 28px 16px 48px; }.workbench-header h1, .dashboard-page-heading h1, .welcome-row h1 { font-size: 30px; }.catalog-toolbar, .recommendation-tabs, .dashboard-filter-bar { gap: 9px; }.catalog-search, .dashboard-search { width: 100%; max-width: none; }.recommendation-card { min-height: 0; }.history-card { min-height: 0; }.subscription-main, .subscription-side { padding: 22px; } }
 
 .inventory-page .subtitle { max-width: 580px; }
 .inventory-metrics { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: 30px; }
