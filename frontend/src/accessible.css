@@ -420,6 +420,74 @@ select:focus-visible {
   outline-offset: 2px;
 }
 
+/* Dashboard ejecutivo */
+.executive-dashboard { max-width: 1440px; background: transparent; }
+.executive-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding: 28px 0 32px; }
+.executive-hero h1 { margin: 0; color: #172742; font: 600 clamp(36px, 4vw, 58px)/.98 'Space Grotesk', sans-serif; letter-spacing: -2px; }
+.executive-hero h1 em { color: #087f78; font-style: normal; }
+.executive-hero .subtitle { max-width: 430px; margin-top: 16px; }
+.hero-actions { display: flex; align-items: center; gap: 16px; }
+.live-status { display: flex; align-items: center; gap: 7px; color: #5f778a; font-size: 12px; }
+.live-status i { width: 7px; height: 7px; background: #54b184; border-radius: 50%; box-shadow: 0 0 0 4px #dff4e9; }
+.executive-kpis { display: grid; grid-template-columns: 1.45fr repeat(3, 1fr); gap: 14px; }
+.executive-kpis article { min-height: 148px; padding: 22px; background: #fff; border: 1px solid #dfe7f1; border-radius: 13px; box-shadow: 0 12px 28px rgb(31 55 88 / 6%); }
+.executive-kpis article > span { color: #71839d; font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+.executive-kpis article > strong { display: block; margin-top: 20px; color: #172742; font: 600 30px 'Space Grotesk', sans-serif; }
+.executive-kpis article > strong small { font: 400 12px 'DM Sans', sans-serif; }
+.executive-kpis article > small { display: block; margin-top: 7px; color: #71839d; font-size: 12px; }
+.kpi-primary { position: relative; overflow: hidden; background: #172742 !important; border-color: #172742 !important; }.kpi-primary > span, .kpi-primary > strong { color: #fff !important; }.kpi-primary > small { color: #bbcada !important; }.kpi-spark { position: absolute; right: 22px; bottom: 22px; display: flex; align-items: end; gap: 4px; width: 76px; height: 42px; opacity: .8; }.kpi-spark i { flex: 1; background: #67c3b1; border-radius: 3px 3px 0 0; }.danger-text { color: #d45d5a !important; }.positive-text { color: #3b9c78 !important; }.kpi-progress { height: 7px; margin-top: 17px; overflow: hidden; background: #eaf0f4; border-radius: 9px; }.kpi-progress i { display: block; width: 68%; height: 100%; background: #087f78; border-radius: inherit; }
+.executive-grid { display: grid; grid-template-columns: 1.25fr .9fr; gap: 14px; margin-top: 14px; }.executive-panel, .executive-products { padding: 23px; background: #fff; border: 1px solid #dfe7f1; border-radius: 13px; box-shadow: 0 12px 28px rgb(31 55 88 / 5%); }.executive-panel .panel-header { align-items: center; }.executive-panel h2, .executive-products h2 { margin: 0; color: #172742; font: 600 22px 'Space Grotesk', sans-serif; }.period-switch { display: flex; gap: 4px; padding: 3px; background: #f1f5fa; border-radius: 7px; }.period-switch button { padding: 8px 11px; color: #7889a0; background: transparent; border-radius: 5px; font-size: 11px; }.period-switch button.active { color: #172742; background: #fff; box-shadow: 0 2px 6px #ccd6e3; font-weight: 700; }.demand-summary { margin-top: 25px; }.demand-summary strong { color: #087f78; font: 600 30px 'Space Grotesk', sans-serif; }.demand-summary span { margin-left: 11px; color: #506884; font-size: 13px; }.demand-summary small { display: block; margin-top: 5px; color: #8594a8; font-size: 11px; }.executive-chart { display: flex; height: 190px; margin-top: 20px; }.chart-axis { display: flex; flex-direction: column; justify-content: space-between; width: 34px; padding-bottom: 25px; color: #91a0b1; font-size: 10px; }.chart-plot { position: relative; flex: 1; }.chart-grid-lines { position: absolute; inset: 0 0 25px; display: flex; flex-direction: column; justify-content: space-between; }.chart-grid-lines i { border-top: 1px dashed #dfe7f0; }.chart-bars { position: absolute; inset: 0 10px 25px; display: flex; align-items: end; justify-content: space-around; gap: 7px; }.chart-bars span { width: 6%; min-height: 8px; background: linear-gradient(#087f78, #9bd9ce); border-radius: 4px 4px 0 0; }.chart-bars span:nth-child(-n+5) { background: #c9e7e1; }.chart-labels { position: absolute; right: 0; bottom: 0; left: 0; display: flex; justify-content: space-between; color: #91a0b1; font-size: 10px; }.panel-link { display: flex; align-items: center; gap: 5px; color: #087f78; background: transparent; font-size: 11px; font-weight: 700; }.panel-link .icon { width: 14px; }.risk-list { display: grid; gap: 5px; margin-top: 18px; }.risk-product { display: grid; grid-template-columns: 34px 1fr auto 45px; align-items: center; gap: 10px; width: 100%; min-height: 65px; padding: 8px 4px; color: #172742; background: transparent; border-bottom: 1px solid #edf1f5; text-align: left; }.risk-product:hover { background: #f7fafc; }.risk-product-copy { display: flex; flex-direction: column; min-width: 0; }.risk-product-copy strong { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }.risk-product-copy small { margin-top: 3px; color: #8291a5; font-size: 10px; }.risk-progress { height: 4px; margin-top: 8px; overflow: hidden; background: #edf1f4; border-radius: 5px; }.risk-progress i { display: block; height: 100%; background: #d85c58; border-radius: inherit; }.risk-product-value { color: #60738e; font-size: 11px; text-align: right; }
+.executive-products { margin-top: 14px; }.executive-products-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; }.executive-search { display: flex; align-items: center; gap: 8px; width: 250px; padding: 9px 11px; background: #f5f8fc; border: 1px solid #e0e8f1; border-radius: 7px; }.executive-search .icon { width: 15px; color: #8b9aae; }.executive-search input { width: 100%; border: 0; outline: 0; background: transparent; color: #172742; font-size: 12px; }.executive-tabs { display: flex; gap: 5px; margin-top: 20px; padding-bottom: 11px; border-bottom: 1px solid #e6edf4; }.executive-tabs button { padding: 7px 12px; color: #71829a; background: transparent; border-radius: 5px; font-size: 11px; }.executive-tabs button.active { color: #fff; background: #172742; }.executive-product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 13px; }.executive-product-card { display: grid; grid-template-columns: 34px minmax(120px, 1fr) 72px 82px auto 14px; gap: 9px; align-items: center; min-height: 78px; padding: 11px; color: #172742; background: #fbfcfe; border: 1px solid #e5ebf3; border-radius: 8px; text-align: left; }.executive-product-card:hover { background: #f0f8f5; border-color: #acd7ca; }.executive-product-card > span:nth-child(2) { display: flex; flex-direction: column; min-width: 0; }.executive-product-card strong { overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }.executive-product-card small { display: block; margin-bottom: 4px; color: #8090a5; font-size: 9px; }.executive-product-card > .icon { width: 13px; color: #7b8da5; }.executive-detail { position: fixed; z-index: 30; right: 28px; bottom: 28px; width: min(520px, calc(100% - 32px)); padding: 24px; background: #fff; border: 1px solid #aad7ca; border-radius: 13px; box-shadow: 0 22px 55px rgb(31 55 88 / 20%); }.executive-detail > div { position: relative; }.executive-detail h2 { margin: 0; color: #172742; font: 600 22px 'Space Grotesk', sans-serif; }.executive-detail p:not(.panel-kicker) { color: #60738c; font-size: 13px; line-height: 1.55; }.executive-detail .close-button { position: absolute; top: -8px; right: 0; }.detail-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 18px 0; }.detail-metrics span { padding: 10px; background: #f3f7fb; border-radius: 6px; }.detail-metrics small, .detail-metrics strong { display: block; }.detail-metrics small { color: #7c8da3; font-size: 10px; }.detail-metrics strong { margin-top: 5px; color: #172742; font-size: 12px; }
+@media (max-width: 1050px) { .executive-kpis { grid-template-columns: repeat(2, 1fr); }.executive-grid { grid-template-columns: 1fr; }.executive-product-grid { grid-template-columns: 1fr; } }
+@media (max-width: 720px) { .executive-hero { align-items: flex-start; flex-direction: column; }.executive-hero h1 { font-size: 42px; }.hero-actions { width: 100%; justify-content: space-between; }.executive-kpis { grid-template-columns: 1fr 1fr; }.executive-kpis article { min-height: 130px; padding: 15px; }.executive-kpis article > strong { margin-top: 15px; font-size: 25px; }.executive-panel, .executive-products { padding: 17px 15px; }.executive-products-heading { align-items: flex-start; flex-direction: column; }.executive-search { width: 100%; }.executive-tabs { flex-wrap: wrap; }.detail-metrics { grid-template-columns: 1fr; } }
+
+/* Visual system: clear, premium and consistent across every route. */
+:root {
+  --readable-navy: #172742;
+  --readable-blue: #536984;
+  --readable-muted: #7889a1;
+  --readable-border: #dfe7f1;
+  --readable-surface: #ffffff;
+  --readable-surface-soft: #f5f8fc;
+  --readable-shadow: 0 14px 32px rgb(31 55 88 / 7%);
+}
+
+body { background: #f3f6fb; color: var(--readable-blue); }
+.app-shell { background: #f3f6fb; }
+.sidebar { background: #fbfdff; border-right-color: var(--readable-border); }
+.brand, .workspace-switcher strong, .user-row strong, .nav-item.active, .panel h2, .section-heading h2, .workspace-hero h1, .welcome-row h1, .branch-picker h2, .branch-summary h2, .stock-list-heading h2 { color: var(--readable-navy); }
+.topbar { background: rgb(255 255 255 / 97%); border-bottom-color: var(--readable-border); box-shadow: 0 2px 18px rgb(31 55 88 / 5%); }
+.page-content { max-width: 1440px; }
+.metric-card, .panel, .workspace-card, .workspace-table, .inventory-metric, .branch-picker, .branch-summary, .stock-product-list, .work-view { border-color: var(--readable-border); border-radius: 13px; box-shadow: var(--readable-shadow); }
+.metric-card:hover, .inventory-metric:hover, .workspace-card:hover, .branch-card:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgb(31 55 88 / 10%); }
+.metric-card, .inventory-metric, .workspace-card { transition: transform .2s ease, box-shadow .2s ease; }
+.metric-heading, .inventory-metric .metric-heading { color: #667b98; font-size: 12px; letter-spacing: .6px; }
+.metric-card p, .inventory-metric p { color: var(--readable-blue); font-size: 14px; }
+.panel h2, .section-heading h2, .branch-picker h2, .branch-summary h2, .stock-list-heading h2 { font-size: 23px; letter-spacing: -.2px; }
+.panel-description, .workspace-card small, .company-info span, .company-status, .company-trend, .product-main small, .stock-cell small, .demand-cell small, .coverage-cell small, .alert-copy small, .branch-card-copy small, .stock-product-name small, .stock-product-row > span > small { color: var(--readable-blue); font-size: 13px; }
+.inventory-filters, .catalog-toolbar, .recommendation-tabs, .dashboard-filter-bar { background: var(--readable-surface); border: 1px solid var(--readable-border); border-radius: 10px; box-shadow: 0 8px 22px rgb(31 55 88 / 4%); }
+.inventory-filters select, .table-search, .catalog-search, .dashboard-search { background: var(--readable-surface-soft); border-color: var(--readable-border); }
+.inventory-filters select, .table-search input, .catalog-search input, .dashboard-search input { color: var(--readable-navy); font-size: 14px; }
+.product-header, .stock-list-header, .dashboard-list-header, .catalog-table-head { min-height: 44px; color: #617795; background: #edf3fb; font-size: 11px; letter-spacing: .6px; }
+.product-row, .stock-product-row, .catalog-row, .dashboard-product-card { min-height: 84px; color: var(--readable-navy); border-top-color: #e8eef6; font-size: 13px; }
+.product-main strong, .stock-cell strong, .demand-cell strong, .coverage-cell strong, .catalog-row strong, .dashboard-product-info strong { color: var(--readable-navy); font-size: 14px; }
+.risk-badge, .confidence-pill, .stock-warning, .stock-ok, .row-action, .dashboard-detail { font-size: 12px; }
+.workbench-page { background: transparent; }
+.workbench-header, .dashboard-page-heading, .welcome-row { border-bottom-color: var(--readable-border); }
+.workbench-header h1, .dashboard-page-heading h1, .welcome-row h1 { color: var(--readable-navy); font-size: clamp(31px, 3vw, 43px); }
+.workbench-header h1::after, .dashboard-page-heading h1::after, .welcome-row h1::after { content: ''; display: inline-block; width: 26px; height: 3px; margin: 0 0 8px 10px; background: #c5a25d; border-radius: 3px; }
+.workbench-header .subtitle, .dashboard-page-heading .subtitle, .welcome-row .subtitle { color: var(--readable-blue); font-size: 16px; }
+.primary-button, .refresh-button { min-height: 46px; border-radius: 8px; font-size: 13px; box-shadow: 0 6px 16px rgb(8 127 120 / 14%); }
+.outline-button, .text-button { min-height: 44px; font-size: 13px; }
+.recommendation-kpis article, .recommendation-card, .catalog-table, .history-maturity, .history-card, .subscription-main, .subscription-side { border-color: var(--readable-border); border-radius: 12px; box-shadow: var(--readable-shadow); }
+.recommendation-kpis article { min-height: 144px; }.recommendation-kpis strong { color: var(--readable-navy); font-size: 30px; }.recommendation-kpis em { font-size: 12px; }
+.recommendation-card { min-height: 170px; }.recommendation-product h2 { color: var(--readable-navy); font-size: 17px; }.recommendation-product p, .recommendation-buy small, .recommendation-date small { color: var(--readable-blue); font-size: 12px; }
+.history-maturity strong { font-size: 38px; }.history-card { min-height: 340px; }.history-card h2 { color: var(--readable-navy); font-size: 20px; }.history-card > p { color: var(--readable-blue); font-size: 13px; }.upload-zone { background: #f8fbff; border-color: #a6b9d2; }
+.subscription-price { font-size: 38px; }.subscription-side p, .subscription-actions, .subscription-cards small { font-size: 12px; }
+.ml-status, .dashboard-note { font-size: 13px; }
+@media (max-width: 900px) { .page-content { padding: 36px 28px 60px; }.recommendation-kpis, .history-grid, .subscription-layout { grid-template-columns: 1fr; } }
+@media (max-width: 720px) { .page-content { padding: 28px 16px 48px; }.workbench-header h1, .dashboard-page-heading h1, .welcome-row h1 { font-size: 31px; }.subtitle, .workbench-header .subtitle, .dashboard-page-heading .subtitle { font-size: 14px; }.catalog-toolbar, .recommendation-tabs, .dashboard-filter-bar { padding: 12px; gap: 9px; }.catalog-search, .dashboard-search { width: 100%; max-width: none; }.history-card, .subscription-main, .subscription-side { min-height: 0; padding: 22px; }.subscription-price { margin-top: 18px; text-align: left; } }
+
 @media (max-width: 1050px) {
   .sidebar {
     width: 238px;
