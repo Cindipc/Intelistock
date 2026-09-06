@@ -1,29 +1,29 @@
 # Integración del módulo ML — IntelliStock
 
-Este documento resume todo lo que necesitan quienes trabajan en BD, API/CRUD y frontend para integrar el módulo de Machine Learning ya construido y probado.
+Este documento resume lo que necesitan quienes trabajen en BD, API/CRUD y frontend para integrar el módulo de Machine Learning ya construido y probado. Todo el proyecto se construye desde cero — este documento no asume ninguna tabla, endpoint ni credencial existente.
 
 ---
 
 ## 1. Variables de entorno (`.env`)
 
-El módulo de ML en sí **no se conecta directo a Postgres ni al frontend** — solo recibe datos ya estructurados (vía Pydantic) y devuelve resultados. Quien sí necesita el `.env` es la capa de **API/CRUD**, para conectar Postgres y exponer los endpoints al frontend.
+El módulo de ML **no se conecta directo a Postgres ni al frontend** — solo recibe datos ya estructurados (vía Pydantic) y devuelve resultados. Quien sí necesita definir y usar el `.env` es la capa de **API/CRUD**, para conectar Postgres y exponer los endpoints al frontend.
 
-Archivo `backend/.env` (no se sube a git, agrégalo a `.gitignore` si no está):
+Plantilla sugerida para `backend/.env` (no se sube a git — agregar a `.gitignore`):
 
 ```env
-# --- Base de datos ---
-DATABASE_URL=postgresql://usuario:password@localhost:5432/intelistock_db
+# --- Base de datos (a definir por quien monta Postgres) ---
+DATABASE_URL=postgresql://usuario:password@localhost:5432/nombre_bd
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=intelistock_db
-DB_USER=usuario
-DB_PASSWORD=password
+DB_NAME=
+DB_USER=
+DB_PASSWORD=
 
 # --- API ---
 API_HOST=0.0.0.0
 API_PORT=8000
 API_ENV=development          # development | production
-CORS_ORIGINS=http://localhost:5173   # URL del frontend (Vite default)
+CORS_ORIGINS=http://localhost:5173   # URL del frontend
 
 # --- ML ---
 ML_MODELS_DIR=./ml/models    # donde se guardan los .joblib
@@ -31,9 +31,9 @@ ML_MIN_DIAS_HISTORIAL=30
 ML_DIAS_RECOMENDADOS=90
 ```
 
-Nota: los valores reales de usuario/password/host de Postgres los define quien monta la BD — esto es solo la plantilla de qué variables debe haber.
+Todos los valores (nombre de BD, usuario, password, puertos) los define el equipo al montar el proyecto — esto es solo la plantilla de qué variables debe existir.
 
-El **frontend** típicamente solo necesita saber la URL base de la API:
+Frontend, plantilla mínima:
 
 ```env
 # frontend/.env
@@ -42,9 +42,9 @@ VITE_API_URL=http://localhost:8000
 
 ---
 
-## 2. Rutas de API que se deben crear (para quien hace el CRUD/FastAPI)
+## 2. Rutas de API a crear (para quien haga el CRUD/FastAPI)
 
-Estas rutas son las que conectan el frontend con tu módulo ML. Los nombres son sugeridos, pueden ajustarse en equipo:
+Nombres sugeridos, ajustables en equipo. Conectan el frontend con el módulo ML:
 
 | Método | Ruta | Qué hace | Función ML que llama |
 |---|---|---|---|
@@ -55,7 +55,7 @@ Estas rutas son las que conectan el frontend con tu módulo ML. Los nombres son 
 | `POST` | `/negocios/{negocio_id}/ventas/excel` | Recibe el Excel subido por el usuario y lo normaliza al esquema ML | No es ML — lo resuelve el CRUD, pero debe entregar datos en el formato de `VentaHistorica` |
 | `POST` | `/negocios/{negocio_id}/reporte-evaluacion` | (Opcional) Genera el reporte de MAE vs baseline por producto | `generar_reporte(datos, resumen)` |
 
-**Formato esperado en request/response:** usar directamente las clases de `backend/ml/src/schema.py` (`VentaHistorica`, `MovimientoStock`, `DatosEntrenamiento`, `SolicitudPrediccion`, `ResultadoPrediccion`) como los `Pydantic models` de FastAPI — ya están listas para eso, no hay que duplicarlas.
+**Formato de request/response:** usar directamente las clases de `backend/ml/src/schema.py` (`VentaHistorica`, `MovimientoStock`, `DatosEntrenamiento`, `SolicitudPrediccion`, `ResultadoPrediccion`) como `Pydantic models` de FastAPI — ya están listas para eso, no hay que duplicarlas.
 
 Ejemplo de cómo se vería el endpoint de predicción:
 
@@ -77,10 +77,11 @@ def obtener_prediccion(negocio_id: str, solicitud: SolicitudPrediccion):
 
 ---
 
-## 3. Lo que necesita la persona de BD (Postgres)
+## 3. Lo que necesita la persona de BD (Postgres) — desde cero
+
+No existe ninguna tabla previa. Estas son las mínimas necesarias para que el ML funcione; el resto del esquema (usuarios, negocios, suscripciones, catálogo de productos, etc.) lo define el equipo según el diseño completo del producto.
 
 ### 3.1 Tabla de ventas históricas
-Mínimo necesario para que el ML funcione:
 
 ```sql
 CREATE TABLE ventas_historicas (
@@ -94,7 +95,7 @@ CREATE TABLE ventas_historicas (
 );
 ```
 
-### 3.2 Tabla de movimientos de inventario (ya existía como `inventario_movimientos`)
+### 3.2 Tabla de movimientos de inventario
 
 ```sql
 CREATE TABLE inventario_movimientos (
@@ -107,7 +108,7 @@ CREATE TABLE inventario_movimientos (
 );
 ```
 
-### 3.3 Tabla nueva: registro de modelos entrenados
+### 3.3 Tabla de modelos entrenados
 
 ```sql
 CREATE TABLE modelos_entrenados (
@@ -124,26 +125,29 @@ CREATE TABLE modelos_entrenados (
 );
 ```
 
+Nota: `negocio_id` y `producto_id` se asumen `UUID` aquí porque así los definimos en el `schema.py` del ML (como `str`), pero el tipo exacto (UUID vs entero autoincremental) lo decide finalmente quien diseñe el esquema completo de negocios/productos — solo hay que mantener consistencia entre esas tablas y estas.
+
 ### 3.4 Reglas de negocio que la BD/API deben aplicar antes de llamar al ML
-- Mínimo **30 días** de historial para poder entrenar (`ML_MIN_DIAS_HISTORIAL`).
-- Recomendado **90 días** para mayor precisión (`ML_DIAS_RECOMENDADOS`) — si hay menos, se debe mostrar advertencia al usuario (el campo `advertencia` que devuelve `puede_entrenar()`).
-- Los horizontes de predicción están fijos a **15 o 30 días** — no se debe permitir un valor arbitrario desde el frontend.
+- Mínimo **30 días** de historial para poder entrenar.
+- Recomendado **90 días** para mayor precisión — si hay menos, mostrar la `advertencia` que devuelve `puede_entrenar()`.
+- Horizontes de predicción fijos a **15 o 30 días** — no permitir valores arbitrarios desde el frontend.
 
 ### 3.5 Pendiente de decidir en equipo
-- Dónde viven físicamente los archivos `.joblib` en producción (disco del servidor vs almacenamiento externo tipo S3) — afecta el campo `path_archivo`.
-- Cuándo se dispara el reentrenamiento automático (¿cada semana? ¿cada X ventas nuevas?) — no implementado todavía, es v2.
+- Dónde viven físicamente los archivos `.joblib` en producción (disco del servidor vs almacenamiento externo tipo S3).
+- Cuándo se dispara el reentrenamiento automático — no implementado todavía, es v2.
+- Diseño completo de las demás tablas del sistema (negocios, usuarios, suscripciones, catálogo de productos) — este documento solo cubre lo mínimo que el módulo ML necesita para funcionar.
 
 ---
 
-## 4. Resumen para quien hace el CRUD/API
+## 4. Resumen para quien haga el CRUD/API
 
-- Las funciones que debes importar y usar están en `backend/ml/src/`:
+- Funciones a importar desde `backend/ml/src/`:
   - `preprocessing.puede_entrenar(datos: DatosEntrenamiento) -> dict`
   - `train.entrenar_modelo(datos: DatosEntrenamiento) -> dict`
   - `preprocessing.construir_dataset(datos: DatosEntrenamiento) -> pd.DataFrame`
   - `predict.predecir(solicitud: SolicitudPrediccion, ultimos_datos: pd.DataFrame) -> ResultadoPrediccion`
   - `evaluate.generar_reporte(datos: DatosEntrenamiento, resumen_entrenamiento: dict) -> pd.DataFrame`
 - Todos los modelos de datos (`VentaHistorica`, `MovimientoStock`, etc.) ya son clases Pydantic — se pueden usar directo como `response_model` o body de FastAPI sin reescribirlas.
-- `predecir()` ya maneja el caso de que no exista modelo entrenado (devuelve `confianza="sin_datos"` en vez de tronar) — no hace falta un try/except adicional para ese caso específico.
-- El módulo fue probado con: modelo confiable, modelo de confianza media, fallback por poco historial, producto sin ventas, e historial insuficiente para entrenar. Todos los casos están cubiertos en `backend/ml/notebooks/prueba_flujo.py` como referencia.
+- `predecir()` ya maneja el caso de que no exista modelo entrenado (devuelve `confianza="sin_datos"` en vez de tronar).
+- El módulo fue probado con: modelo confiable, modelo de confianza media, fallback por poco historial, producto sin ventas, e historial insuficiente para entrenar — todos los casos están en `backend/ml/notebooks/prueba_flujo.py` como referencia.
 - Dependencias exactas en `backend/requirements.txt`.
