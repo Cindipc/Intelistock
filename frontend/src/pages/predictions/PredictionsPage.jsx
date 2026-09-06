@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Icon from '../../components/ui/Icon'
 import { branches, inventoryProducts } from '../../data/dashboardData'
-import { obtenerPrediccion } from '../../routes/api'
+import { listarProductos, normalizarProducto, obtenerPrediccion } from '../../routes/api'
 const NEGOCIO_ID_DEMO = 1
 
 function StockProductList({ products, apiRecomendaciones }) {
@@ -13,14 +13,14 @@ function StockProductList({ products, apiRecomendaciones }) {
         <div>
           <p className="panel-kicker">PRODUCTOS EN STOCK</p>
           <h2>{apiRecomendaciones ? 'Demanda proyectada (modelo real)' : 'Inventario disponible'}</h2>
-          <p>La predicción usa las unidades vendidas en los últimos 30 días y la tendencia reciente.</p>
+          <p>La prediccion usa las unidades vendidas en los ultimos 30 dias y la tendencia reciente.</p>
         </div>
         <span>{products.length} productos</span>
       </div>
       <div className="stock-list-table">
         <div className="stock-list-header">
-          <span>PRODUCTO</span><span>STOCK ACTUAL</span><span>VENDIDOS 30 DÍAS</span>
-          <span>PREDICCIÓN</span><span>CONFIANZA</span>
+          <span>PRODUCTO</span><span>STOCK ACTUAL</span><span>VENDIDOS 30 DIAS</span>
+          <span>PREDICCION</span><span>CONFIANZA</span>
         </div>
         {products.map((product) => {
           const recomendacion = buscarRecomendacion(product)
@@ -34,7 +34,7 @@ function StockProductList({ products, apiRecomendaciones }) {
               <strong>{product.sold30} u.</strong>
               <span>
                 <strong className="projected-demand">
-                  {recomendacion ? `${Math.round(recomendacion.cantidad_estimada)} u.` : `${Math.round(product.sold30 * (1 + Number.parseFloat(product.trend) / 100))} u.`}
+                  {recomendacion ? `${recomendacion.cantidad_estimada} u.` : `${Math.round(product.sold30 * (1 + Number.parseFloat(product.trend) / 100))} u.`}
                 </strong>
                 <small>{recomendacion ? `en ${recomendacion.horizonte_dias} dias` : `${product.trend} (estimado)`}</small>
               </span>
@@ -50,6 +50,37 @@ function StockProductList({ products, apiRecomendaciones }) {
   )
 }
 
+function useBackendProducts() {
+  const [products, setProducts] = useState(inventoryProducts.filter(p => p.available > 0))
+  const [dataSource, setDataSource] = useState('loading')
+
+  useEffect(() => {
+    let cancelled = false
+    listarProductos(NEGOCIO_ID_DEMO)
+      .then((data) => {
+        if (!cancelled) {
+          if (Array.isArray(data) && data.length > 0) {
+            const normalized = data.map(normalizarProducto)
+            setProducts(normalized.filter(p => p.available > 0))
+            setDataSource('backend')
+          } else if (Array.isArray(data)) {
+            setProducts(inventoryProducts.filter(p => p.available > 0))
+            setDataSource('empty')
+          }
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setProducts(inventoryProducts.filter(p => p.available > 0))
+          setDataSource('demo')
+        }
+      })
+    return () => { cancelled = true }
+  }, [])
+
+  return { products, dataSource }
+}
+
 export default function PredictionsPage({ onOpenModal }) {
   const [branchId, setBranchId] = useState(branches[0].id)
   const [view, setView] = useState('Resumen')
@@ -57,21 +88,32 @@ export default function PredictionsPage({ onOpenModal }) {
   const [cargando, setCargando] = useState(false)
   const [error, setError] = useState(null)
 
+  const { products: backendProducts, dataSource } = useBackendProducts()
   const branch = branches.find((item) => item.id === branchId)
-  const inStockProducts = useMemo(() => inventoryProducts.filter((product) => product.available > 0), [])
+  const inStockProducts = useMemo(() => backendProducts.filter((product) => product.available > 0), [backendProducts])
   const predictedDemand = (product) => Math.round(product.sold30 * (1 + Number.parseFloat(product.trend) / 100))
 
   const calcularConIA = async () => {
     setCargando(true)
     setError(null)
     try {
-      const respuestas = await Promise.all(inStockProducts.map((product) => obtenerPrediccion(NEGOCIO_ID_DEMO, { producto_id: product.backendId ?? Number(product.id), dias: 15 })))
+      const productosParaPredecir = inStockProducts.filter(p => p.backendId)
+      if (productosParaPredecir.length === 0) {
+        setError('No hay productos con ID de backend para predecir.')
+        return
+      }
+      const respuestas = await Promise.all(productosParaPredecir.map((product) => obtenerPrediccion(NEGOCIO_ID_DEMO, { producto_id: product.backendId, dias: 15 })))
       setApiRecomendaciones(respuestas)
       setView('Demanda')
     } catch (err) {
-      setError(err.message || 'No se pudo conectar con el servicio de predicción.')
+      const msg = err.message?.includes('__DB_ERR__')
+        ? err.message.replace('__DB_ERR__', '')
+        : err.message?.includes('__CONN_ERR__')
+          ? err.message.replace('__CONN_ERR__', '')
+          : err.message || 'No se pudo conectar con el servicio de prediccion.'
+      setError(msg)
       if (onOpenModal) {
-        onOpenModal({ eyebrow: 'Error de prediccion', title: 'No se pudo calcular', children: <p>{err.message || 'Error desconocido.'}</p> })
+        onOpenModal({ eyebrow: 'Error de prediccion', title: 'No se pudo calcular', children: <p>{msg}</p> })
       }
     } finally {
       setCargando(false)
@@ -93,6 +135,17 @@ export default function PredictionsPage({ onOpenModal }) {
           </select>
         </label>
       </section>
+
+      {dataSource === 'empty' && (
+        <div className="branch-insight" style={{ background: '#edf3fc', color: '#5175af', marginBottom: 16, borderRadius: 8, padding: '10px 16px', fontSize: 12 }}>
+          <span>ℹ</span><span>Backend conectado pero sin productos. Crea productos o sube ventas para usar el modelo de prediccion.</span>
+        </div>
+      )}
+      {dataSource === 'demo' && (
+        <div className="branch-insight" style={{ background: '#fff8f0', color: '#aa741d', marginBottom: 16, borderRadius: 8, padding: '10px 16px', fontSize: 12 }}>
+          <span>⚠</span><span>Backend no disponible. Mostrando datos de demostracion.</span>
+        </div>
+      )}
 
       <section className="branch-picker">
         <div className="branch-picker-heading">
@@ -130,15 +183,15 @@ export default function PredictionsPage({ onOpenModal }) {
         </div>
 
         <div className="branch-kpis">
-          <article><span>PRODUCTOS</span><strong>{branch.products}</strong><small>catalogados</small></article>
-          <article><span>VALOR EN STOCK</span><strong>{branch.stockValue}</strong><small>inventario actual</small></article>
-          <article><span>DEMANDA 15 DIAS</span><strong>{branch.demand}</strong><small>proyeccion estimada</small></article>
+          <article><span>PRODUCTOS</span><strong>{inStockProducts.length}</strong><small>{dataSource === 'backend' ? 'en backend' : dataSource === 'empty' ? 'sin datos' : 'demo'}</small></article>
+          <article><span>STOCK TOTAL</span><strong>{inStockProducts.reduce((s, p) => s + p.available, 0)} u.</strong><small>unidades</small></article>
+          <article><span>EN RIESGO</span><strong>{inStockProducts.filter(p => p.risk === 'Critico' || p.risk === 'Bajo').length}</strong><small>requieren atencion</small></article>
         </div>
 
         {view === 'Resumen' && (
           <div className="branch-insight">
             <span className="status-pulse" />
-            <span>La sucursal tiene <strong>2 productos en riesgo</strong>. Calcula la predicción real con el modelo antes de generar la próxima orden.</span>
+            <span>La sucursal tiene <strong>{inStockProducts.filter(p => p.risk === 'Critico' || p.risk === 'Bajo').length} productos en riesgo</strong>. Calcula la prediccion real con el modelo antes de generar la proxima orden.</span>
             <button onClick={calcularConIA} disabled={cargando}>
               {cargando ? 'Calculando...' : 'Calcular con IA'} <Icon name="arrow" />
             </button>
@@ -148,7 +201,7 @@ export default function PredictionsPage({ onOpenModal }) {
         {error && (
           <div className="branch-insight" style={{ background: '#fee4de', color: '#c5684e' }}>
             <span>⚠</span>
-            <span>{error} Se están mostrando datos estimados localmente mientras se restablece la conexión.</span>
+            <span>{error}</span>
             <button onClick={calcularConIA}>Reintentar</button>
           </div>
         )}
@@ -164,7 +217,7 @@ export default function PredictionsPage({ onOpenModal }) {
                   <strong>
                     {view === 'Stock'
                       ? `${product.available} u.`
-                      : `${recomendacion ? Math.round(recomendacion.cantidad_estimada) : predictedDemand(product)} u.`}
+                      : `${recomendacion ? recomendacion.cantidad_estimada : predictedDemand(product)} u.`}
                   </strong>
                   <span className={`risk-badge risk-${product.risk.toLowerCase()}`}>
                     {recomendacion ? recomendacion.confianza : product.risk}

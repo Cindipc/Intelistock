@@ -25,11 +25,14 @@ class ProductoOut(ProductoCreate):
 
 
 class PrediccionRequest(BaseModel):
+    negocio_id: int
     producto_id: int
     dias: int = 7
 
 
 class PrediccionResponse(BaseModel):
     producto_id: int
-    predicciones: list[float]
-    fechas: list[str]
+    horizonte_dias: int
+    cantidad_estimada: float
+    confianza: str
+    metodo_usado: str

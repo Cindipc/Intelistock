@@ -1,15 +1,22 @@
+from datetime import date
+from pathlib import Path
+
 import pandas as pd
-import joblib
-from sklearn.linear_model import SGDRegressor
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline
 from sqlalchemy.orm import Session
-from models.db_models import Venta, VentaDetalle
+from models.db_models import InventarioMovimiento, Venta, VentaDetalle
+from ml.src.predict import predecir
+from ml.src.preprocessing import construir_dataset, puede_entrenar
+from ml.src.schema import (
+    DatosEntrenamiento,
+    HorizontePrediccion,
+    MovimientoStock,
+    SolicitudPrediccion,
+    VentaHistorica,
+)
+from ml.src.train import entrenar_modelo as entrenar_modelos_ml
 
-MODEL_PATH = "models_ml/pipeline_v1.pkl"
 
-
-def extraer_datos_entrenamiento(negocio_id: int, db: Session) -> pd.DataFrame:
+def construir_datos_entrenamiento(negocio_id: int, db: Session) -> DatosEntrenamiento:
     query = (
         db.query(
             Venta.fecha_hora,
@@ -21,39 +28,63 @@ def extraer_datos_entrenamiento(negocio_id: int, db: Session) -> pd.DataFrame:
         .filter(Venta.negocio_id == negocio_id)
     )
 
-    df = pd.read_sql(query.statement, db.bind)
-    return df
-
-
-def construir_features(df: pd.DataFrame) -> pd.DataFrame:
-    df["dia_semana"] = pd.to_datetime(df["fecha_hora"]).dt.dayofweek
-    df["dia_mes"] = pd.to_datetime(df["fecha_hora"]).dt.day
-    df["mes"] = pd.to_datetime(df["fecha_hora"]).dt.month
-    return df[["producto_id", "dia_semana", "dia_mes", "mes", "precio_unitario_venta"]]
+    ventas = [
+        VentaHistorica(
+            negocio_id=str(negocio_id),
+            producto_id=str(row.producto_id),
+            fecha=pd.Timestamp(row.fecha_hora).date(),
+            cantidad_vendida=int(row.cantidad),
+        )
+        for row in query.all()
+    ]
+    movimientos = [
+        MovimientoStock(
+            negocio_id=str(row.negocio_id),
+            producto_id=str(row.producto_id),
+            fecha=row.fecha,
+            tipo=row.tipo,
+            cantidad=row.cantidad,
+        )
+        for row in db.query(InventarioMovimiento)
+        .filter(InventarioMovimiento.negocio_id == negocio_id)
+        .all()
+    ]
+    return DatosEntrenamiento(
+        negocio_id=str(negocio_id), ventas=ventas, movimientos_stock=movimientos
+    )
 
 
 def entrenar_modelo(negocio_id: int, db: Session) -> dict:
-    df = extraer_datos_entrenamiento(negocio_id, db)
+    datos = construir_datos_entrenamiento(negocio_id, db)
+    validacion = puede_entrenar(datos)
+    if not validacion["puede_entrenar"]:
+        raise ValueError(validacion["razon"])
 
-    if len(df) < 30:
-        raise ValueError(
-            "No hay suficientes datos históricos para entrenar (mínimo 30 registros)"
-        )
+    resumen = entrenar_modelos_ml(datos)
+    return {
+        "mensaje": "Modelos entrenados",
+        "negocio_id": negocio_id,
+        "dias_historial": validacion["dias_historial"],
+        "advertencia": validacion.get("advertencia"),
+        "productos": resumen,
+    }
 
-    X = construir_features(df)
-    y = df["cantidad"]
 
-    pipeline = Pipeline(
-        [
-            ("scaler", StandardScaler()),
-            ("regresor", SGDRegressor(max_iter=1000, random_state=42)),
-        ]
+def predecir_producto(negocio_id: int, producto_id: int, dias: int, db: Session):
+    if dias not in {7, 15, 30}:
+        raise ValueError("El horizonte debe ser de 7, 15 o 30 días")
+
+    datos = construir_datos_entrenamiento(negocio_id, db)
+    dataset = construir_dataset(datos)
+    historico = dataset[dataset["producto_id"] == str(producto_id)].sort_values("fecha")
+    if historico.empty:
+        historico = dataset[dataset["producto_id"] == producto_id].sort_values("fecha")
+    if historico.empty:
+        raise ValueError("No hay historial para el producto solicitado")
+
+    solicitud = SolicitudPrediccion(
+        negocio_id=str(negocio_id),
+        producto_id=str(producto_id),
+        horizonte_dias=HorizontePrediccion(str(dias)),
     )
-    pipeline.fit(X, y)
-
-    joblib.dump(pipeline, MODEL_PATH)
-    return {"mensaje": "Modelo entrenado", "muestras_usadas": len(df)}
-
-
-def cargar_modelo():
-    return joblib.load(MODEL_PATH)
+    return predecir(solicitud, historico)

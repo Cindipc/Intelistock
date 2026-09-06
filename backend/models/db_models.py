@@ -1,7 +1,30 @@
-from sqlalchemy import Column, Integer, String, Numeric, TIMESTAMP, ForeignKey
+from sqlalchemy import Column, Integer, String, Numeric, TIMESTAMP, ForeignKey, Date
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
+
+
+class Negocio(Base):
+    __tablename__ = "negocios"
+    negocio_id = Column(Integer, primary_key=True)
+    nombre = Column(String(150), nullable=False)
+
+
+class Categoria(Base):
+    __tablename__ = "categorias"
+    categoria_id = Column(Integer, primary_key=True)
+    negocio_id = Column(Integer, ForeignKey("negocios.negocio_id"))
+    nombre = Column(String(100), nullable=False)
+
+
+class InventarioMovimiento(Base):
+    __tablename__ = "inventario_movimientos"
+    movimiento_id = Column(Integer, primary_key=True)
+    negocio_id = Column(Integer, ForeignKey("negocios.negocio_id"), nullable=False)
+    producto_id = Column(Integer, ForeignKey("productos.producto_id"), nullable=False)
+    fecha = Column(Date, nullable=False)
+    tipo = Column(String(20), nullable=False)
+    cantidad = Column(Integer, nullable=False)
 
 
 class Producto(Base):

@@ -49,8 +49,8 @@ Nombres sugeridos, ajustables en equipo. Conectan el frontend con el módulo ML:
 | Método | Ruta | Qué hace | Función ML que llama |
 |---|---|---|---|
 | `POST` | `/negocios/{negocio_id}/historico/validar` | Revisa si el negocio tiene suficiente historial antes de entrenar | `puede_entrenar(datos)` |
-| `POST` | `/negocios/{negocio_id}/entrenar` | Entrena/reentrena los modelos de todos los productos del negocio | `entrenar_modelo(datos)` |
-| `POST` | `/negocios/{negocio_id}/predicciones` | Devuelve la predicción de un producto a 15 o 30 días | `predecir(solicitud, ultimos_datos)` |
+| `POST` | `/ml/entrenar?negocio_id={negocio_id}` | Entrena/reentrena los modelos de todos los productos del negocio | `entrenar_modelo(datos)` |
+| `POST` | `/ml/predecir` | Devuelve la predicción de un producto a 7, 15 o 30 días | `predecir(solicitud, ultimos_datos)` |
 | `GET` | `/negocios/{negocio_id}/modelos/estado` | Lista qué productos tienen modelo, con qué confianza y método | Lee de la tabla `modelos_entrenados` (ver abajo) |
 | `POST` | `/negocios/{negocio_id}/ventas/excel` | Recibe el Excel subido por el usuario y lo normaliza al esquema ML | No es ML — lo resuelve el CRUD, pero debe entregar datos en el formato de `VentaHistorica` |
 | `POST` | `/negocios/{negocio_id}/reporte-evaluacion` | (Opcional) Genera el reporte de MAE vs baseline por producto | `generar_reporte(datos, resumen)` |
@@ -130,7 +130,7 @@ Nota: `negocio_id` y `producto_id` se asumen `UUID` aquí porque así los defini
 ### 3.4 Reglas de negocio que la BD/API deben aplicar antes de llamar al ML
 - Mínimo **30 días** de historial para poder entrenar.
 - Recomendado **90 días** para mayor precisión — si hay menos, mostrar la `advertencia` que devuelve `puede_entrenar()`.
-- Horizontes de predicción fijos a **15 o 30 días** — no permitir valores arbitrarios desde el frontend.
+- Horizontes de predicción fijos a **7, 15 o 30 días** — no permitir valores arbitrarios desde el frontend.
 
 ### 3.5 Pendiente de decidir en equipo
 - Dónde viven físicamente los archivos `.joblib` en producción (disco del servidor vs almacenamiento externo tipo S3).
