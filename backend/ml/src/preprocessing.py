@@ -10,6 +10,9 @@ def construir_stock_diario(
     if df.empty:
         return pd.DataFrame(columns=["producto_id", "fecha", "stock"])
 
+    df["fecha"] = pd.to_datetime(df["fecha"])
+    fecha_inicio = pd.Timestamp(fecha_inicio)
+    fecha_fin = pd.Timestamp(fecha_fin)
     df["delta"] = df.apply(
         lambda r: r["cantidad"] if r["tipo"] == "entrada" else -r["cantidad"], axis=1
     )
@@ -39,6 +42,25 @@ def construir_stock_diario(
 def construir_dataset(datos: DatosEntrenamiento) -> pd.DataFrame:
     """Une ventas + stock reconstruido, genera features base para entrenar."""
     ventas_df = pd.DataFrame([v.model_dump() for v in datos.ventas])
+    if ventas_df.empty:
+        return pd.DataFrame(
+            columns=[
+                "producto_id",
+                "fecha",
+                "cantidad_vendida",
+                "negocio_abierto",
+                "stock",
+                "stock_agotado",
+                "dia_semana",
+                "dia_mes",
+                "mes",
+                "es_fin_semana",
+                "venta_lag_1",
+                "venta_lag_7",
+                "venta_lag_14",
+                "media_movil_7",
+            ]
+        )
     ventas_df["fecha"] = pd.to_datetime(ventas_df["fecha"])
 
     fecha_inicio = ventas_df["fecha"].min()
@@ -54,7 +76,7 @@ def construir_dataset(datos: DatosEntrenamiento) -> pd.DataFrame:
     df = df[df["negocio_abierto"] == True].copy()
 
     # Marcar posible demanda censurada (se quedó sin stock)
-    df["stock_agotado"] = df["stock"] <= 0
+    df["stock_agotado"] = (df["stock"] <= 0).astype(int)
 
     # Features de calendario
     df["dia_semana"] = df["fecha"].dt.dayofweek

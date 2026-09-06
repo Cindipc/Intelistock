@@ -1,0 +1,470 @@
+:root {
+  --text-readable: #334241;
+  --text-soft: #687875;
+  --surface-tint: #f1f8f4;
+  --shadow-soft: 0 10px 30px rgb(29 40 41 / 7%);
+}
+
+body {
+  color: var(--text-readable);
+  font-size: 15px;
+  line-height: 1.5;
+  background: #f3f7f3;
+}
+
+button,
+input,
+select {
+  min-height: 42px;
+}
+
+.sidebar {
+  width: 270px;
+  padding: 30px 18px 20px;
+  box-shadow: 6px 0 24px rgb(29 40 41 / 4%);
+}
+
+.brand {
+  font-size: 23px;
+  letter-spacing: 0;
+}
+
+.brand-mark {
+  width: 34px;
+  height: 34px;
+  font-size: 24px;
+}
+
+.workspace-switcher {
+  margin: 36px 4px 28px;
+  padding: 12px;
+}
+
+.workspace-switcher strong,
+.user-row strong {
+  font-size: 13px;
+}
+
+.workspace-switcher small,
+.user-row small {
+  font-size: 12px;
+}
+
+.nav-label {
+  margin-bottom: 10px;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.nav-item {
+  gap: 13px;
+  padding: 13px 14px;
+  font-size: 14px;
+}
+
+.nav-badge {
+  min-width: 22px;
+  height: 22px;
+  font-size: 12px;
+}
+
+.help-card {
+  padding: 14px 10px;
+}
+
+.help-card strong {
+  font-size: 12px;
+}
+
+.help-card small {
+  font-size: 11px;
+}
+
+.topbar {
+  height: 82px;
+  padding: 0 48px;
+}
+
+.breadcrumb {
+  font-size: 14px;
+}
+
+.search-box {
+  width: 260px;
+  padding: 10px 0;
+}
+
+.search-box input {
+  min-height: 32px;
+  font-size: 14px;
+}
+
+.topbar-actions {
+  gap: 24px;
+}
+
+.page-content {
+  padding: 48px 54px 72px;
+}
+
+.eyebrow,
+.panel-kicker {
+  margin-bottom: 10px;
+  font-size: 12px;
+  letter-spacing: 1.1px;
+}
+
+.subtitle {
+  margin-top: 14px;
+  color: var(--text-soft);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.inventory-page .welcome-row h1 {
+  font-size: 0;
+  letter-spacing: 0;
+}
+
+.inventory-page .welcome-row h1::before {
+  content: 'Buenos días';
+  font: 600 clamp(28px, 3vw, 39px)/1.1 'Space Grotesk', sans-serif;
+}
+
+.inventory-page .welcome-row h1 span {
+  display: none;
+}
+
+.refresh-button,
+.outline-button {
+  min-height: 44px;
+  padding: 11px 18px;
+  font-size: 14px;
+}
+
+.metric-grid,
+.dashboard-grid,
+.workspace-cards,
+.inventory-layout {
+  gap: 20px;
+}
+
+.metric-card,
+.panel,
+.workspace-card,
+.inventory-metric,
+.branch-picker,
+.branch-summary,
+.stock-product-list,
+.work-view {
+  box-shadow: var(--shadow-soft);
+}
+
+.metric-card {
+  min-height: 178px;
+  padding: 22px;
+}
+
+.metric-heading,
+.inventory-metric span,
+.workspace-card span {
+  font-size: 11px;
+  letter-spacing: .8px;
+}
+
+.metric-card > strong,
+.workspace-card strong {
+  font-size: 30px;
+  letter-spacing: 0;
+}
+
+.metric-card p,
+.inventory-metric p,
+.workspace-card small,
+.data-source small,
+.progress-labels {
+  font-size: 13px;
+}
+
+.panel {
+  padding: 25px 25px 21px;
+}
+
+.panel h2,
+.section-heading h2,
+.branch-picker h2,
+.branch-summary h2,
+.stock-list-heading h2 {
+  font-size: 22px;
+  letter-spacing: 0;
+}
+
+.period-tabs button {
+  min-height: 38px;
+  padding: 7px 12px;
+  font-size: 12px;
+}
+
+.chart-legend,
+.y-axis,
+.chart-note,
+.alert-impact,
+.branch-count,
+.stock-list-heading > span {
+  font-size: 12px;
+}
+
+.company-card {
+  min-height: 76px;
+  padding: 12px 16px;
+}
+
+.company-info strong,
+.product-main strong,
+.stock-cell strong,
+.demand-cell strong,
+.coverage-cell strong,
+.alert-copy strong,
+.branch-card-copy strong,
+.stock-product-row strong {
+  font-size: 14px;
+}
+
+.company-info span,
+.company-status,
+.company-trend,
+.product-main small,
+.stock-cell small,
+.demand-cell small,
+.coverage-cell small,
+.alert-copy small,
+.branch-card-copy small,
+.stock-product-name small,
+.stock-product-row > span > small {
+  font-size: 12px;
+}
+
+.workspace-row {
+  min-height: 68px;
+  font-size: 14px;
+}
+
+.workspace-row strong,
+.workspace-row > span:not(.row-number):not(.company-arrow) {
+  font-size: 13px;
+}
+
+.inventory-metric {
+  min-height: 148px;
+  padding: 20px;
+}
+
+.inventory-metric .metric-heading {
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.inventory-metric strong {
+  margin-top: 16px;
+  font-size: 31px;
+}
+
+.inventory-metric p {
+  margin-top: 7px;
+  font-size: 14px;
+}
+
+.inventory-filters select,
+.table-search,
+.table-search input,
+.branch-id-field select {
+  min-height: 42px;
+  font-size: 13px;
+}
+
+.product-header,
+.stock-list-header,
+.alert-group h3 {
+  font-size: 11px;
+}
+
+.product-row,
+.stock-product-row {
+  font-size: 13px;
+}
+
+.risk-badge,
+.row-action,
+.alert-group h3 span,
+.branch-status {
+  font-size: 12px;
+}
+
+.work-heading h2 {
+  font-size: 23px;
+}
+
+.work-heading p:not(.panel-kicker),
+.work-status,
+.work-recommendation p,
+.work-consequence {
+  font-size: 13px;
+}
+
+.work-grid h3 {
+  font-size: 15px;
+}
+
+.stock-compare strong {
+  font-size: 28px;
+}
+
+.branch-card {
+  min-height: 92px;
+  padding: 14px;
+}
+
+.branch-id-field {
+  gap: 8px;
+  font-size: 12px;
+}
+
+.stock-list-heading p:not(.panel-kicker) {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.critical-modal {
+  box-shadow: 0 20px 60px rgb(29 40 41 / 20%);
+}
+
+.critical-modal .modal-label,
+.critical-modal dt {
+  font-size: 11px;
+}
+
+.critical-modal h2 {
+  font-size: 26px;
+  letter-spacing: 0;
+}
+
+.critical-modal > p,
+.critical-modal dd {
+  font-size: 14px;
+}
+
+/* Keep supporting text readable across every view. */
+small,
+.eyebrow,
+.panel-kicker,
+.nav-label,
+.metric-heading,
+.inventory-metric p,
+.workspace-card small,
+.company-info span,
+.company-status,
+.company-trend,
+.company-trend small,
+.panel-description,
+.product-header,
+.product-main small,
+.stock-cell small,
+.demand-cell small,
+.coverage-cell small,
+.alert-group h3,
+.alert-copy small,
+.alert-impact,
+.branch-count,
+.branch-id-field,
+.branch-card-copy small,
+.branch-status,
+.stock-list-header,
+.stock-product-name small,
+.stock-product-row > span > small,
+.empty-state {
+  font-size: 13px;
+}
+
+.subtitle,
+.stock-list-heading p:not(.panel-kicker),
+.work-heading p:not(.panel-kicker),
+.work-status,
+.work-consequence,
+.work-recommendation p,
+.critical-modal > p,
+.critical-modal dd {
+  font-size: 15px;
+}
+
+.nav-item,
+.search-box input,
+.refresh-button,
+.outline-button,
+.text-button,
+.inventory-filters select,
+.table-search input,
+.product-row,
+.stock-product-row,
+.row-action,
+.risk-badge,
+.work-grid h3,
+.work-recommendation strong,
+.branch-card-copy strong {
+  font-size: 14px;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid rgb(8 127 120 / 35%);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1050px) {
+  .sidebar {
+    width: 238px;
+  }
+
+  .topbar {
+    padding: 0 30px;
+  }
+
+  .page-content {
+    padding: 40px 30px 60px;
+  }
+}
+
+@media (max-width: 720px) {
+  .topbar {
+    height: 70px;
+    padding: 0 18px;
+  }
+
+  .topbar-actions {
+    gap: 12px;
+  }
+
+  .search-box {
+    width: min(48vw, 220px);
+  }
+
+  .page-content {
+    padding: 32px 18px 48px;
+  }
+
+  .subtitle {
+    font-size: 15px;
+  }
+
+  .panel,
+  .branch-picker,
+  .branch-summary,
+  .stock-product-list {
+    padding: 20px 16px;
+  }
+
+  .metric-card {
+    min-height: 155px;
+    padding: 19px;
+  }
+}
