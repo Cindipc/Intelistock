@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Icon from '../../components/ui/Icon'
 import { inventoryAlerts, inventoryProducts } from '../../data/dashboardData'
+import { listarProductos, normalizarProducto } from '../../routes/api'
 
 const riskOrder = ['Critico', 'Bajo', 'Sobrestock', 'Saludable']
 
@@ -17,7 +18,9 @@ function RiskProduct({ product, onSelect }) {
 export default function DashboardPage({ query, onQueryChange, onRefresh, onOpenModal }) {
   const [selected, setSelected] = useState(null)
   const [activeFilter, setActiveFilter] = useState('Todos')
-  const products = useMemo(() => inventoryProducts.filter((product) => (activeFilter === 'Todos' || product.risk === activeFilter) && `${product.name} ${product.sku}`.toLowerCase().includes(query.toLowerCase())).sort((a, b) => riskOrder.indexOf(a.risk) - riskOrder.indexOf(b.risk)), [activeFilter, query])
+  const [catalogProducts, setCatalogProducts] = useState(inventoryProducts)
+  useEffect(() => { listarProductos(1).then((data) => setCatalogProducts(data.map(normalizarProducto))).catch(() => {}) }, [])
+  const products = useMemo(() => catalogProducts.filter((product) => (activeFilter === 'Todos' || product.risk === activeFilter) && `${product.name} ${product.sku}`.toLowerCase().includes(query.toLowerCase())).sort((a, b) => riskOrder.indexOf(a.risk) - riskOrder.indexOf(b.risk)), [activeFilter, catalogProducts, query])
   const riskProducts = products.filter((product) => product.risk === 'Critico' || product.risk === 'Bajo')
   const openProduct = (product) => setSelected(product)
 

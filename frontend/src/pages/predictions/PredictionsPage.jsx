@@ -1,12 +1,11 @@
 import { useMemo, useState } from 'react'
 import Icon from '../../components/ui/Icon'
 import { branches, inventoryProducts } from '../../data/dashboardData'
-import { obtenerRecomendacionesCompra } from '../../routes/api'
-import { NEGOCIO_ID_DEMO } from '../../data/datosDemo'
+import { obtenerPrediccion } from '../../routes/api'
+const NEGOCIO_ID_DEMO = 1
 
 function StockProductList({ products, apiRecomendaciones }) {
-  const buscarRecomendacion = (sku) =>
-    apiRecomendaciones?.find((r) => r.producto_id === sku)
+  const buscarRecomendacion = (product) => apiRecomendaciones?.find((r) => Number(r.producto_id) === Number(product.backendId))
 
   return (
     <section className="stock-product-list">
@@ -24,7 +23,7 @@ function StockProductList({ products, apiRecomendaciones }) {
           <span>PREDICCIÓN</span><span>CONFIANZA</span>
         </div>
         {products.map((product) => {
-          const recomendacion = buscarRecomendacion(product.sku)
+          const recomendacion = buscarRecomendacion(product)
           return (
             <div className="stock-product-row" key={product.id}>
               <span className="stock-product-name">
@@ -66,8 +65,8 @@ export default function PredictionsPage({ onOpenModal }) {
     setCargando(true)
     setError(null)
     try {
-      const respuesta = await obtenerRecomendacionesCompra(NEGOCIO_ID_DEMO, '15')
-      setApiRecomendaciones(respuesta.recomendaciones || [])
+      const respuestas = await Promise.all(inStockProducts.map((product) => obtenerPrediccion(NEGOCIO_ID_DEMO, { producto_id: product.backendId ?? Number(product.id), dias: 15 })))
+      setApiRecomendaciones(respuestas)
       setView('Demanda')
     } catch (err) {
       setError(err.message || 'No se pudo conectar con el servicio de predicción.')
@@ -158,7 +157,7 @@ export default function PredictionsPage({ onOpenModal }) {
           <div className="branch-data-table">
             <div><span>PRODUCTO</span><span>{view === 'Stock' ? 'STOCK DISPONIBLE' : 'DEMANDA 15 DIAS'}</span><span>ESTADO</span></div>
             {inStockProducts.map((product) => {
-              const recomendacion = apiRecomendaciones?.find((r) => r.producto_id === product.sku)
+              const recomendacion = apiRecomendaciones?.find((r) => Number(r.producto_id) === Number(product.backendId))
               return (
                 <div key={product.id}>
                   <span><strong>{product.name}</strong><small>{product.sku}</small></span>
