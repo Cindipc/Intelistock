@@ -1,5 +1,10 @@
 fastapi
 uvicorn
+SQLAlchemy
+psycopg2-binary
+python-dotenv
+python-multipart
+openpyxl
 joblib==1.5.3
 numpy==2.4.4
 pandas==3.0.3
