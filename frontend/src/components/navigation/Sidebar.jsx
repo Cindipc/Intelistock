@@ -1,9 +1,10 @@
 import Icon from '../ui/Icon'
 import { navigation } from '../../data/dashboardData'
+import logo from '../../assets/InteliStock.jpeg'
 
 export default function Sidebar({ activeView, onNavigate }) {
   return <aside className="sidebar">
-    <div className="brand"><span className="brand-mark">i</span><span>intelistock</span></div>
+    <div className="brand"><img src={logo} alt="InteliStock" className="brand-mark" /><span>intelistock</span></div>
     <div className="workspace-switcher"><span className="workspace-avatar">A</span><span><strong>Alimentos del Valle</strong><small>Espacio de trabajo</small></span><span className="chevron">⌄</span></div>
     <nav aria-label="Navegación principal">
       <p className="nav-label">GESTIÓN</p>
