@@ -34,7 +34,9 @@ def listar_productos(negocio_id: int, db: Session = Depends(get_db)):
 @router.get("/{producto_id}", response_model=ProductoOut)
 def obtener_producto(producto_id: int, db: Session = Depends(get_db)):
     try:
-        producto = db.query(Producto).filter(Producto.producto_id == producto_id).first()
+        producto = (
+            db.query(Producto).filter(Producto.producto_id == producto_id).first()
+        )
         if not producto:
             raise HTTPException(status_code=404, detail="Producto no encontrado")
         return producto
@@ -47,7 +49,9 @@ def actualizar_producto(
     producto_id: int, cambios: ProductoUpdate, db: Session = Depends(get_db)
 ):
     try:
-        producto = db.query(Producto).filter(Producto.producto_id == producto_id).first()
+        producto = (
+            db.query(Producto).filter(Producto.producto_id == producto_id).first()
+        )
         if not producto:
             raise HTTPException(status_code=404, detail="Producto no encontrado")
         for campo, valor in cambios.model_dump(exclude_unset=True).items():
@@ -62,7 +66,9 @@ def actualizar_producto(
 @router.delete("/{producto_id}")
 def eliminar_producto(producto_id: int, db: Session = Depends(get_db)):
     try:
-        producto = db.query(Producto).filter(Producto.producto_id == producto_id).first()
+        producto = (
+            db.query(Producto).filter(Producto.producto_id == producto_id).first()
+        )
         if not producto:
             raise HTTPException(status_code=404, detail="Producto no encontrado")
         db.delete(producto)

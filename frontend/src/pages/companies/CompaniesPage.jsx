@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
-import { listarProductos, listarVentas, normalizarProducto } from '../../routes/api'
-
-const NEGOCIO_ID = 1
+import { listarProductos, listarVentas, normalizarProducto, NEGOCIO_ID } from '../../routes/api'
 
 export default function CompaniesPage() {
   const [products, setProducts] = useState([])

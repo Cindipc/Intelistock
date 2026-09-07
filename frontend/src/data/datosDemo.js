@@ -1,6 +1,6 @@
-import { crearProducto } from '../routes/api'
+import { crearProducto, NEGOCIO_ID } from '../routes/api'
 
-export const NEGOCIO_ID_DEMO = 1
+export const NEGOCIO_ID_DEMO = NEGOCIO_ID
 
 export async function sembrarDatosDemo(productos) {
   const resultados = { creados: 0, errores: 0 }

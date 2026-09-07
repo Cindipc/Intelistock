@@ -1,4 +1,5 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+export const NEGOCIO_ID = Number(import.meta.env.VITE_NEGOCIO_ID || 1)
 const TIMEOUT_MS = 15000
 
 function negocioParam(negocioId) {
@@ -44,13 +45,15 @@ export const crearProducto = (negocioId, producto) => request('/productos/', { m
 export const editarProducto = (negocioId, productoId, producto) => request(`/productos/${productoId}`, { method: 'PATCH', body: JSON.stringify({ nombre: producto.nombre, precio_unitario: producto.precio_unitario, stock_actual: producto.stock_actual }) })
 export const eliminarProducto = (negocioId, productoId) => request(`/productos/${productoId}`, { method: 'DELETE' })
 export const listarVentas = (negocioId) => request(`/ventas/?negocio_id=${negocioParam(negocioId)}`)
+export const obtenerResumenNegocio = (negocioId) => request(`/negocios/${negocioParam(negocioId)}/resumen`)
 export const eliminarVenta = (ventaId) => request(`/ventas/${ventaId}`, { method: 'DELETE' })
 export const entrenarConDatosGuardados = (negocioId) => request(`/ml/entrenar?negocio_id=${negocioParam(negocioId)}`, { method: 'POST' })
 
 export const obtenerPrediccion = async (negocioId, solicitud) => {
   const productoId = Number(solicitud.producto_id)
-  const dias = Number(solicitud.dias ?? solicitud.horizonte_dias ?? 7)
-  return request('/ml/predecir', { method: 'POST', body: JSON.stringify({ negocio_id: negocioParam(negocioId), producto_id: productoId, dias }) })
+  const dias = String(solicitud.dias ?? solicitud.horizonte_dias ?? 15)
+  const query = new URLSearchParams({ negocio_id: negocioParam(negocioId), producto_id: productoId, horizonte_dias: dias })
+  return request(`/ml/predecir?${query}`, { method: 'POST' })
 }
 
 export const importarVentas = (negocioId, archivo) => { const formData = new FormData(); formData.append('archivo', archivo); return request(`/importacion/ventas?negocio_id=${negocioParam(negocioId)}`, { method: 'POST', body: formData }) }
@@ -70,5 +73,5 @@ export function normalizarVenta(venta) {
   }
 }
 
-const api = { checkHealth, listarProductos, crearProducto, editarProducto, eliminarProducto, listarVentas, eliminarVenta, entrenarConDatosGuardados, obtenerPrediccion, importarVentas }
+const api = { checkHealth, listarProductos, crearProducto, editarProducto, eliminarProducto, listarVentas, obtenerResumenNegocio, eliminarVenta, entrenarConDatosGuardados, obtenerPrediccion, importarVentas }
 export default api

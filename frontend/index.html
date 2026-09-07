@@ -1,10 +1,18 @@
 <!doctype html>
-<html lang="en">
+<html lang="es" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <meta name="description" content="IntelliStock · Motor de prediccion e inventario inteligente" />
+    <title>IntelliStock · Predicción de inventario</title>
+    <script>
+      (function () {
+        var ua = navigator.userAgent || '';
+        var darkByEnvironment = /Code\/|vscode|SimpleBrowser|LivePreview/i.test(ua);
+        document.documentElement.setAttribute('data-theme', darkByEnvironment ? 'dark' : 'light');
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

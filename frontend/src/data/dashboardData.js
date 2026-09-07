@@ -1,9 +1,3 @@
-export const companies = [
-  { name: 'Mercado Norte', sector: 'Alimentos y bebidas', initials: 'MN', tone: 'coral', status: 'En seguimiento', trend: '+12.4%' },
-  { name: 'Casa Raiz', sector: 'Hogar y decoracion', initials: 'CR', tone: 'yellow', status: 'Revision sugerida', trend: '+8.1%' },
-  { name: 'Taller 17', sector: 'Manufactura ligera', initials: 'T17', tone: 'blue', status: 'Datos actualizados', trend: '+4.7%' },
-]
-
 export const chartData = [
   { month: 'Ene', value: 48, forecast: false }, { month: 'Feb', value: 55, forecast: false },
   { month: 'Mar', value: 51, forecast: false }, { month: 'Abr', value: 68, forecast: false },
@@ -16,7 +10,7 @@ export const navigation = [
   { label: 'Resumen', icon: 'grid' },
   { label: 'Predicciones', icon: 'trend', badge: '3' },
   { label: 'Datos historicos', icon: 'database' },
-  { label: 'Empresas', icon: 'building' },
+  { label: 'Mi Negocio', icon: 'building' },
 ]
 
 export const inventoryProducts = [
