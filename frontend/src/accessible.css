@@ -18,6 +18,13 @@ select {
   min-height: 42px;
 }
 
+.top-avatar,
+.icon-button,
+.workspace-avatar,
+.user-avatar {
+  min-height: 0;
+}
+
 .sidebar {
   width: 270px;
   padding: 30px 18px 20px;
@@ -172,7 +179,7 @@ select {
   letter-spacing: .8px;
 }
 
-.metric-card > strong,
+.metric-card>strong,
 .workspace-card strong {
   font-size: 30px;
   letter-spacing: 0;
@@ -210,7 +217,7 @@ select {
 .chart-note,
 .alert-impact,
 .branch-count,
-.stock-list-heading > span {
+.stock-list-heading>span {
   font-size: 12px;
 }
 
@@ -240,7 +247,7 @@ select {
 .alert-copy small,
 .branch-card-copy small,
 .stock-product-name small,
-.stock-product-row > span > small {
+.stock-product-row>span>small {
   font-size: 12px;
 }
 
@@ -250,7 +257,7 @@ select {
 }
 
 .workspace-row strong,
-.workspace-row > span:not(.row-number):not(.company-arrow) {
+.workspace-row>span:not(.row-number):not(.company-arrow) {
   font-size: 13px;
 }
 
@@ -348,7 +355,7 @@ select {
   letter-spacing: 0;
 }
 
-.critical-modal > p,
+.critical-modal>p,
 .critical-modal dd {
   font-size: 14px;
 }
@@ -380,7 +387,7 @@ small,
 .branch-status,
 .stock-list-header,
 .stock-product-name small,
-.stock-product-row > span > small,
+.stock-product-row>span>small,
 .empty-state {
   font-size: 13px;
 }
@@ -391,7 +398,7 @@ small,
 .work-status,
 .work-consequence,
 .work-recommendation p,
-.critical-modal > p,
+.critical-modal>p,
 .critical-modal dd {
   font-size: 15px;
 }

@@ -35,14 +35,14 @@ export default function BusinessPage() {
       </div>
 
       {dataSource === 'error' && (
-        <div className="branch-insight" style={{ background: '#fee4de', color: '#c5684e', marginBottom: 16, borderRadius: 8, padding: '10px 16px', fontSize: 12 }}>
+        <div className="notice notice-danger">
           <span>⚠</span><span>{error}</span>
         </div>
       )}
 
       {dataSource === 'loading' && (
-        <div className="branch-insight" style={{ background: '#edf3fc', color: '#5175af', marginBottom: 16, borderRadius: 8, padding: '10px 16px', fontSize: 12 }}>
-          <span>ℹ</span><span>Cargando informacion del negocio...</span>
+        <div className="notice notice-info">
+          <span className="status-pulse" /><span>Cargando informacion del negocio...</span>
         </div>
       )}
 

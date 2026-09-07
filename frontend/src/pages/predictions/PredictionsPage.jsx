@@ -92,13 +92,8 @@ export default function PredictionsPage({ onOpenModal }) {
   const { products: backendProducts, dataSource } = useBackendProducts()
   const branch = branches.find((item) => item.id === branchId)
   const inStockProducts = useMemo(() => backendProducts.filter((product) => product.available > 0), [backendProducts])
+  const productoActivo = productoSeleccionado || (inStockProducts.length > 0 ? String(inStockProducts[0].backendId) : '')
   const predictedDemand = (product) => Math.round(product.sold30 * (1 + Number.parseFloat(product.trend) / 100))
-
-  useEffect(() => {
-    if (!productoSeleccionado && inStockProducts.length > 0) {
-      setProductoSeleccionado(String(inStockProducts[0].backendId))
-    }
-  }, [inStockProducts, productoSeleccionado])
 
   const mergeRecomendacion = (nueva) => {
     setApiRecomendaciones((prev) => {
@@ -108,14 +103,14 @@ export default function PredictionsPage({ onOpenModal }) {
   }
 
   const calcularUnProducto = async () => {
-    if (!productoSeleccionado) {
+    if (!productoActivo) {
       setError('Selecciona un producto primero.')
       return
     }
     setCargando(true)
     setError(null)
     try {
-      const respuesta = await obtenerPrediccion(NEGOCIO_ID, { producto_id: productoSeleccionado, horizonte_dias: horizonteSeleccionado })
+      const respuesta = await obtenerPrediccion(NEGOCIO_ID, { producto_id: productoActivo, horizonte_dias: horizonteSeleccionado })
       mergeRecomendacion(respuesta)
       setView('Demanda')
     } catch (err) {
@@ -177,12 +172,12 @@ export default function PredictionsPage({ onOpenModal }) {
       </section>
 
       {dataSource === 'empty' && (
-        <div className="branch-insight" style={{ background: '#edf3fc', color: '#5175af', marginBottom: 16, borderRadius: 8, padding: '10px 16px', fontSize: 12 }}>
+        <div className="notice notice-info">
           <span>ℹ</span><span>Backend conectado pero sin productos. Crea productos o sube ventas para usar el modelo de prediccion.</span>
         </div>
       )}
       {dataSource === 'demo' && (
-        <div className="branch-insight" style={{ background: '#fff8f0', color: '#aa741d', marginBottom: 16, borderRadius: 8, padding: '10px 16px', fontSize: 12 }}>
+        <div className="notice notice-warn">
           <span>⚠</span><span>Backend no disponible. Mostrando datos de demostracion.</span>
         </div>
       )}
@@ -230,23 +225,23 @@ export default function PredictionsPage({ onOpenModal }) {
 
         {view === 'Resumen' && (
           <>
-            <div className="panel" style={{ marginTop: 17, display: 'flex', alignItems: 'flex-end', gap: 16, flexWrap: 'wrap' }}>
-              <label className="branch-id-field" style={{ minWidth: 220 }}>
+            <div className="panel predict-controls">
+              <label className="branch-id-field predict-product">
                 <span>PRODUCTO</span>
-                <select value={productoSeleccionado} onChange={(e) => setProductoSeleccionado(e.target.value)}>
+                <select value={productoActivo} onChange={(e) => setProductoSeleccionado(e.target.value)}>
                   {inStockProducts.map((p) => (
                     <option key={p.id} value={p.backendId}>{p.name}</option>
                   ))}
                 </select>
               </label>
-              <label className="branch-id-field" style={{ minWidth: 140 }}>
+              <label className="branch-id-field predict-horizon">
                 <span>HORIZONTE</span>
                 <select value={horizonteSeleccionado} onChange={(e) => setHorizonteSeleccionado(e.target.value)}>
                   <option value="15">15 dias</option>
                   <option value="30">30 dias</option>
                 </select>
               </label>
-              <button className="refresh-button" onClick={calcularUnProducto} disabled={cargando || !productoSeleccionado}>
+              <button className="refresh-button align-stretch" onClick={calcularUnProducto} disabled={cargando || !productoActivo}>
                 {cargando ? 'Calculando...' : 'Predecir este producto'}
               </button>
             </div>
@@ -262,7 +257,7 @@ export default function PredictionsPage({ onOpenModal }) {
         )}
 
         {error && (
-          <div className="branch-insight" style={{ background: '#fee4de', color: '#c5684e' }}>
+          <div className="branch-insight notice notice-danger">
             <span>⚠</span>
             <span>{error}</span>
             <button onClick={calcularConIA}>Reintentar</button>

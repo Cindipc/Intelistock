@@ -2,6 +2,29 @@ import { useEffect, useMemo, useState } from 'react'
 import { inventoryAlerts, inventoryProducts } from '../../data/dashboardData'
 import { listarProductos, normalizarProducto, NEGOCIO_ID } from '../../routes/api'
 
+const kpiIcons = {
+  valor: (
+    <svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2v20M17 5.5c-1-1.2-3-1.8-5-1.8-2.6 0-4.5 1.2-4.5 3 0 4.5 10 2.5 10 7 0 1.9-2 3-4.8 3-2.2 0-4.3-.7-5.4-2" />
+    </svg>
+  ),
+  riesgo: (
+    <svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+    </svg>
+  ),
+  totales: (
+    <svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m21 16-9 5-9-5M21 8l-9 5-9-5 9-5 9 5Z" /><path d="m3 16 9 5 9-5" />
+    </svg>
+  ),
+  saludable: (
+    <svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 12h-2m-1.7 4.2 1.4 1.4M22 18h-2M18 13a6 6 0 1 0-2.9 5.1M8.4 14.6a4 4 0 1 1 6-4.6" />
+    </svg>
+  ),
+}
+
 const riskOrder = ['Critico', 'Bajo', 'Sobrestock', 'Saludable']
 const riskIconClass = { Critico: 'orange', Bajo: 'orange', Sobrestock: 'blue', Saludable: 'green' }
 
@@ -89,14 +112,14 @@ export default function DashboardPage({ query, onRefresh, onOpenModal, updated }
         </button>
       </section>
 
-      <div className="branch-insight" style={{ marginTop: 16 }}>
-        <span className="status-pulse" />
-        <span>{dataSource === 'backend' ? 'Mostrando datos reales del backend.' : dataSource === 'empty' ? 'Backend conectado pero sin productos todavia.' : 'Backend no disponible, mostrando datos de demostracion.'}</span>
-      </div>
+<div className={`branch-insight notice ${dataSource === 'backend' ? 'notice-info' : dataSource === 'empty' ? 'notice-info' : 'notice-warn'}`}>
+          <span className="status-pulse" />
+          <span>{dataSource === 'backend' ? 'Mostrando datos reales del backend.' : dataSource === 'empty' ? 'Backend conectado pero sin productos todavia.' : 'Backend no disponible, mostrando datos de demostracion.'}</span>
+        </div>
 
       <section className="metric-grid">
         <article className="metric-card">
-          <div className="metric-heading"><span>VALOR DEL INVENTARIO</span></div>
+          <div className="metric-heading"><span>VALOR DEL INVENTARIO</span><span className="metric-icon coral-bg">{kpiIcons.valor}</span></div>
           <strong>{valorFormateado}</strong>
           <p>{totalProductos} productos en catalogo</p>
           <div className="mini-bars">
@@ -104,20 +127,20 @@ export default function DashboardPage({ query, onRefresh, onOpenModal, updated }
           </div>
         </article>
         <article className="metric-card">
-          <div className="metric-heading"><span>PRODUCTOS EN RIESGO</span></div>
-          <strong>{String(productosEnRiesgo).padStart(2, '0')}</strong>
+          <div className="metric-heading"><span>PRODUCTOS EN RIESGO</span><span className="metric-icon yellow-bg">{kpiIcons.riesgo}</span></div>
+          <strong className="danger">{String(productosEnRiesgo).padStart(2, '0')}</strong>
           <p>{criticos} criticos · {bajos} bajos</p>
         </article>
         <article className="metric-card">
-          <div className="metric-heading"><span>PRODUCTOS TOTALES</span></div>
+          <div className="metric-heading"><span>PRODUCTOS TOTALES</span><span className="metric-icon blue-bg">{kpiIcons.totales}</span></div>
           <strong>{totalProductos}</strong>
           <p>{dataSource === 'backend' ? 'Del backend' : 'De demostracion'}</p>
         </article>
       </section>
 
-      <section className="metric-grid" style={{ marginTop: 17 }}>
-        <article className="metric-card" style={{ gridColumn: 'span 1' }}>
-          <div className="metric-heading"><span>INVENTARIO SALUDABLE</span></div>
+      <section className="metric-grid">
+        <article className="metric-card">
+          <div className="metric-heading"><span>INVENTARIO SALUDABLE</span><span className="metric-icon green-bg">{kpiIcons.saludable}</span></div>
           <strong>{porcentajeSaludable}%</strong>
           <p>Objetivo operativo: 75%</p>
           <div className="progress-line"><span style={{ width: `${porcentajeSaludable}%` }} /></div>
@@ -166,13 +189,13 @@ export default function DashboardPage({ query, onRefresh, onOpenModal, updated }
               </div>
             ))}
           </div>
-          <a className="alert-footer" href="#" onClick={(e) => { e.preventDefault(); onOpenModal({ eyebrow: 'Panel de alertas', title: 'Todas las alertas', children: <div>{inventoryAlerts.map(a => <div key={a.id} style={{ padding: '8px 0', borderBottom: '1px solid #eee' }}><strong>{a.type}</strong><p>{a.product} — {a.recommendation}</p></div>)}</div> }) }}>
+          <a className="alert-footer" href="#" onClick={(e) => { e.preventDefault(); onOpenModal({ eyebrow: 'Panel de alertas', title: 'Todas las alertas', children: <div>{inventoryAlerts.map(a => <div key={a.id} style={{ padding: '8px 0', borderBottom: '1px solid var(--border)' }}><strong>{a.type}</strong><p>{a.product} — {a.recommendation}</p></div>)}</div> }) }}>
             Ver todas las alertas
           </a>
         </section>
       </div>
 
-      <section className="workspace-table" style={{ marginTop: 24 }}>
+      <section className="workspace-table">
         <div className="table-header">
           <div>
             <p className="panel-kicker">CATALOGO DE PRODUCTOS</p>

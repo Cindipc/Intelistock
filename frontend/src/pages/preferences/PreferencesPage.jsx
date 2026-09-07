@@ -25,7 +25,7 @@ export default function PreferencesPage() {
         <article className="workspace-card"><span>USUARIOS CON ACCESO</span><strong>4</strong><small>1 administrador</small></article>
       </section>
 
-      <section className="workspace-table" style={{ marginTop: 24 }}>
+      <section className="workspace-table">
         <div className="table-header">
           <div>
             <p className="panel-kicker">CONFIGURACION</p>
