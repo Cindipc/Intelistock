@@ -18,20 +18,21 @@ export default class ErrorBoundary extends Component {
     if (this.state.hasError) {
       return (
         <div style={{ padding: 40, textAlign: 'center', fontFamily: 'DM Sans, sans-serif' }}>
-          <h2 style={{ color: '#1d2829' }}>Algo salió mal</h2>
-          <p style={{ color: '#7d8989', marginBottom: 20 }}>
+          <h2 style={{ color: 'var(--ink)' }}>Algo salió mal</h2>
+          <p style={{ color: 'var(--muted)', marginBottom: 20 }}>
             Ocurrió un error inesperado en esta sección. Intenta recargar la página.
           </p>
           <button
             onClick={() => window.location.reload()}
             style={{
               padding: '10px 18px',
-              background: '#087f78',
-              color: '#fff',
-              borderRadius: 7,
+              background: 'linear-gradient(135deg, #eccb9c, #d8ad76)',
+              color: '#221811',
+              borderRadius: 12,
               fontWeight: 700,
               fontSize: 12,
               cursor: 'pointer',
+              boxShadow: '0 8px 22px rgb(216 173 118 / 30%)',
             }}
           >
             Recargar página

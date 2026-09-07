@@ -4,6 +4,21 @@ from sqlalchemy.orm import declarative_base, relationship
 Base = declarative_base()
 
 
+class Negocio(Base):
+    __tablename__ = "negocios"
+    negocio_id = Column(Integer, primary_key=True)
+    nombre = Column(String(150), nullable=False)
+    rfc = Column(String(20), unique=True)
+    fecha_registro = Column(TIMESTAMP)
+    estado = Column(String(20), nullable=False, default="activo")
+
+
+class Categoria(Base):
+    __tablename__ = "categorias"
+    categoria_id = Column(Integer, primary_key=True)
+    nombre = Column(String(100), nullable=False, unique=True)
+
+
 class Producto(Base):
     __tablename__ = "productos"
     producto_id = Column(Integer, primary_key=True)
@@ -31,3 +46,13 @@ class VentaDetalle(Base):
     cantidad = Column(Integer, nullable=False)
     precio_unitario_venta = Column(Numeric(10, 2), nullable=False)
     venta = relationship("Venta", back_populates="detalles")
+
+
+class InventarioMovimiento(Base):
+    __tablename__ = "inventario_movimientos"
+    movimiento_id = Column(Integer, primary_key=True)
+    producto_id = Column(Integer, ForeignKey("productos.producto_id"))
+    tipo_movimiento = Column(String(20), nullable=False)  # entrada | salida | ajuste
+    cantidad = Column(Integer, nullable=False)
+    fecha_hora = Column(TIMESTAMP)
+    referencia_venta_id = Column(Integer, ForeignKey("ventas.venta_id"))

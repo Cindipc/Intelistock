@@ -2,7 +2,10 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_absolute_error
 
-from ml.src.preprocessing import construir_dataset, contar_registros_por_producto
+from ml.src.preprocessing import (
+    construir_dataset,
+    contar_registros_por_producto,
+)
 from ml.src.schema import DatosEntrenamiento
 
 FEATURES = [

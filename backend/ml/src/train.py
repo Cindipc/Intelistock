@@ -6,7 +6,10 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_absolute_error
 
-from ml.src.preprocessing import construir_dataset, contar_registros_por_producto
+from ml.src.preprocessing import (
+    construir_dataset,
+    contar_registros_por_producto,
+)
 from ml.src.schema import DatosEntrenamiento
 
 MODELS_DIR = Path(__file__).resolve().parent.parent / "models"
