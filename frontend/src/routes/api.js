@@ -51,8 +51,9 @@ export const entrenarConDatosGuardados = (negocioId) => request(`/ml/entrenar?ne
 
 export const obtenerPrediccion = async (negocioId, solicitud) => {
   const productoId = Number(solicitud.producto_id)
-  const dias = Number(solicitud.dias ?? solicitud.horizonte_dias ?? 7)
-  return request('/ml/predecir', { method: 'POST', body: JSON.stringify({ negocio_id: negocioParam(negocioId), producto_id: productoId, dias }) })
+  const dias = String(solicitud.dias ?? solicitud.horizonte_dias ?? 15)
+  const query = new URLSearchParams({ negocio_id: negocioParam(negocioId), producto_id: productoId, horizonte_dias: dias })
+  return request(`/ml/predecir?${query}`, { method: 'POST' })
 }
 
 export const importarVentas = (negocioId, archivo) => { const formData = new FormData(); formData.append('archivo', archivo); return request(`/importacion/ventas?negocio_id=${negocioParam(negocioId)}`, { method: 'POST', body: formData }) }
