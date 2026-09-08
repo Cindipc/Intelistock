@@ -97,7 +97,7 @@ Los 13 endpoints del frontend (`api.js`) estan perfectamente alineados con las r
 # Backend
 cd backend
 pip install -r requirements.txt
-uvicorn api.main:app --reload --port 8000
+uvicorn main:app --reload --port 8000
 
 # Frontend
 cd frontend

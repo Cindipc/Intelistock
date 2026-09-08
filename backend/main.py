@@ -3,10 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from routers import importacion, negocios, prediccion, productos
 from routers import ventas
+from routers import crud_ml
 from database import db_is_available
 from sqlalchemy.exc import OperationalError
 
-app = FastAPI(title="IntelliStock API")
+app = FastAPI(title="IntelliStock API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -45,6 +46,7 @@ app.include_router(importacion.router)
 app.include_router(prediccion.router)
 app.include_router(ventas.router)
 app.include_router(negocios.router)
+app.include_router(crud_ml.router)
 
 
 @app.get("/")
