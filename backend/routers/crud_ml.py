@@ -1,5 +1,5 @@
-"""
-CRUD MINIMO EN MEMORIA - temporal mientras no existe Postgres.
+"""CRUD y ML en memoria (temporal mientras no existan tablas completas).
+
 Todo se guarda en diccionarios de Python (se pierde al reiniciar el servidor).
 Cuando la BD este lista, este archivo se reemplaza por consultas reales,
 SIN cambiar las rutas ni el frontend.
@@ -9,9 +9,11 @@ from pydantic import BaseModel
 
 from ml.src.schema import VentaHistorica, MovimientoStock, DatosEntrenamiento
 from ml.src.train import entrenar_modelo
-from ml.src.preprocessing import puede_entrenar
+from ml.src.preprocessing import puede_entrenar, construir_dataset
+from ml.src.predict import predecir
+from ml.src.schema import SolicitudPrediccion, ResultadoPrediccion, HorizontePrediccion
 
-router = APIRouter()
+router = APIRouter(prefix="/negocios", tags=["crud-memoria-ml"])
 
 DB = {
     "productos": {},
@@ -27,7 +29,7 @@ def _init_negocio(negocio_id: str):
     DB["movimientos"].setdefault(negocio_id, [])
 
 
-class ProductoCrear(BaseModel):
+class ProductoMemoria(BaseModel):
     nombre: str
     sku: str
     categoria: str
@@ -42,7 +44,7 @@ def listar_productos(negocio_id: str):
 
 
 @router.post("/{negocio_id}/productos")
-def crear_producto(negocio_id: str, producto: ProductoCrear):
+def crear_producto(negocio_id: str, producto: ProductoMemoria):
     _init_negocio(negocio_id)
     producto_id = producto.sku
     if producto_id in DB["productos"][negocio_id]:
@@ -52,7 +54,7 @@ def crear_producto(negocio_id: str, producto: ProductoCrear):
 
 
 @router.put("/{negocio_id}/productos/{producto_id}")
-def editar_producto(negocio_id: str, producto_id: str, producto: ProductoCrear):
+def editar_producto(negocio_id: str, producto_id: str, producto: ProductoMemoria):
     _init_negocio(negocio_id)
     if producto_id not in DB["productos"][negocio_id]:
         raise HTTPException(404, "Producto no encontrado")
@@ -137,3 +139,47 @@ def entrenar_con_datos_guardados(negocio_id: str):
 def estado_historico(negocio_id: str):
     datos = _construir_datos_entrenamiento(negocio_id)
     return puede_entrenar(datos)
+
+
+@router.post("/{negocio_id}/predicciones", response_model=ResultadoPrediccion)
+def obtener_prediccion(negocio_id: str, solicitud: SolicitudPrediccion):
+    if solicitud.negocio_id != negocio_id:
+        raise HTTPException(400, "negocio_id inconsistente entre URL y body")
+    try:
+        datos = _construir_datos_entrenamiento(negocio_id)
+        df_procesado = construir_dataset(datos)
+    except Exception as e:
+        raise HTTPException(500, f"No se pudo procesar el historico. ¿Ya cargaste ventas para este negocio? {e}") from e
+    ultimos_datos = df_procesado[df_procesado["producto_id"] == solicitud.producto_id]
+    if ultimos_datos.empty:
+        raise HTTPException(404, f"No hay historico para el producto {solicitud.producto_id}")
+    try:
+        return predecir(solicitud, ultimos_datos)
+    except Exception as e:
+        raise HTTPException(500, f"Ocurrio un error generando la prediccion: {e}") from e
+
+
+@router.get("/{negocio_id}/recomendaciones-compra")
+def recomendaciones_compra(negocio_id: str, horizonte_dias: str = "15"):
+    try:
+        horizonte_valido = HorizontePrediccion(horizonte_dias)
+    except ValueError:
+        raise HTTPException(400, "horizonte_dias debe ser '15' o '30'")
+    try:
+        datos = _construir_datos_entrenamiento(negocio_id)
+        df_procesado = construir_dataset(datos)
+    except Exception as e:
+        raise HTTPException(500, f"No se pudo procesar el historico. ¿Ya cargaste ventas para este negocio? {e}") from e
+    if df_procesado.empty:
+        return {"negocio_id": negocio_id, "recomendaciones": [], "productos_sin_modelo": []}
+    productos = df_procesado["producto_id"].unique()
+    resultados = []
+    productos_sin_modelo = []
+    for producto_id in productos:
+        ultimos_datos = df_procesado[df_procesado["producto_id"] == producto_id]
+        solicitud = SolicitudPrediccion(negocio_id=negocio_id, producto_id=producto_id, horizonte_dias=horizonte_valido)
+        try:
+            resultados.append(predecir(solicitud, ultimos_datos))
+        except Exception as e:
+            productos_sin_modelo.append(producto_id)
+    return {"negocio_id": negocio_id, "recomendaciones": resultados, "productos_sin_modelo": productos_sin_modelo}

@@ -38,6 +38,8 @@ async function request(endpoint, options = {}) {
   return data
 }
 
+// ===== Rutas con PostgreSQL (main.py raiz) =====
+
 export const checkHealth = () => request('/health')
 
 export const listarProductos = (negocioId) => request(`/productos/?negocio_id=${negocioParam(negocioId)}`)
@@ -46,6 +48,8 @@ export const editarProducto = (negocioId, productoId, producto) => request(`/pro
 export const eliminarProducto = (negocioId, productoId) => request(`/productos/${productoId}`, { method: 'DELETE' })
 export const listarVentas = (negocioId) => request(`/ventas/?negocio_id=${negocioParam(negocioId)}`)
 export const obtenerResumenNegocio = (negocioId) => request(`/negocios/${negocioParam(negocioId)}/resumen`)
+export const obtenerNegocio = (negocioId) => request(`/negocios/${negocioParam(negocioId)}`)
+export const estadoHistorico = (negocioId) => request(`/ml/estado?negocio_id=${negocioParam(negocioId)}`)
 export const eliminarVenta = (ventaId) => request(`/ventas/${ventaId}`, { method: 'DELETE' })
 export const entrenarConDatosGuardados = (negocioId) => request(`/ml/entrenar?negocio_id=${negocioParam(negocioId)}`, { method: 'POST' })
 
@@ -57,6 +61,22 @@ export const obtenerPrediccion = async (negocioId, solicitud) => {
 }
 
 export const importarVentas = (negocioId, archivo) => { const formData = new FormData(); formData.append('archivo', archivo); return request(`/importacion/ventas?negocio_id=${negocioParam(negocioId)}`, { method: 'POST', body: formData }) }
+
+// ===== Rutas CRUD + ML en memoria (routers/crud_ml.py) =====
+
+export const listarProductosMemoria = (negocioId) => request(`/negocios/${negocioId}/productos`)
+export const crearProductoMemoria = (negocioId, producto) => request(`/negocios/${negocioId}/productos`, { method: 'POST', body: JSON.stringify(producto) })
+export const editarProductoMemoria = (negocioId, productoId, producto) => request(`/negocios/${negocioId}/productos/${productoId}`, { method: 'PUT', body: JSON.stringify(producto) })
+export const eliminarProductoMemoria = (negocioId, productoId) => request(`/negocios/${negocioId}/productos/${productoId}`, { method: 'DELETE' })
+export const registrarVentaMemoria = (negocioId, venta) => request(`/negocios/${negocioId}/ventas`, { method: 'POST', body: JSON.stringify({ ...venta, negocio_id: String(negocioId) }) })
+export const registrarVentasLoteMemoria = (negocioId, ventas) => request(`/negocios/${negocioId}/ventas/lote`, { method: 'POST', body: JSON.stringify(ventas.map((v) => ({ ...v, negocio_id: String(negocioId) }))) })
+export const listarVentasMemoria = (negocioId) => request(`/negocios/${negocioId}/ventas`)
+export const registrarMovimientoMemoria = (negocioId, movimiento) => request(`/negocios/${negocioId}/movimientos`, { method: 'POST', body: JSON.stringify({ ...movimiento, negocio_id: String(negocioId) }) })
+export const listarMovimientosMemoria = (negocioId) => request(`/negocios/${negocioId}/movimientos`)
+export const entrenarConDatosMemoria = (negocioId) => request(`/negocios/${negocioId}/entrenar-con-datos-guardados`, { method: 'POST' })
+export const estadoHistoricoMemoria = (negocioId) => request(`/negocios/${negocioId}/historico/estado`)
+export const obtenerPrediccionMemoria = (negocioId, solicitud) => request(`/negocios/${negocioId}/predicciones`, { method: 'POST', body: JSON.stringify({ ...solicitud, negocio_id: String(negocioId) }) })
+export const obtenerRecomendacionesCompra = (negocioId, horizonteDias = '15') => request(`/negocios/${negocioId}/recomendaciones-compra?horizonte_dias=${horizonteDias}`)
 
 export function normalizarProducto(producto, index = 0) {
   const tonos = ['coral', 'blue', 'yellow', 'green']
@@ -73,5 +93,34 @@ export function normalizarVenta(venta) {
   }
 }
 
-const api = { checkHealth, listarProductos, crearProducto, editarProducto, eliminarProducto, listarVentas, obtenerResumenNegocio, eliminarVenta, entrenarConDatosGuardados, obtenerPrediccion, importarVentas }
+const api = {
+  checkHealth,
+  listarProductos,
+  crearProducto,
+  editarProducto,
+  eliminarProducto,
+  listarVentas,
+  obtenerResumenNegocio,
+  obtenerNegocio,
+  estadoHistorico,
+  eliminarVenta,
+  entrenarConDatosGuardados,
+  obtenerPrediccion,
+  importarVentas,
+  listarProductosMemoria,
+  crearProductoMemoria,
+  editarProductoMemoria,
+  eliminarProductoMemoria,
+  registrarVentaMemoria,
+  registrarVentasLoteMemoria,
+  listarVentasMemoria,
+  registrarMovimientoMemoria,
+  listarMovimientosMemoria,
+  entrenarConDatosMemoria,
+  estadoHistoricoMemoria,
+  obtenerPrediccionMemoria,
+  obtenerRecomendacionesCompra,
+  normalizarProducto,
+  normalizarVenta,
+}
 export default api
